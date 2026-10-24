@@ -12,7 +12,7 @@ namespace PinkDream.Editor
     {
         private const string OldPath = "Assets/Scenes/Level02_Placeholder.unity";
         private const string LevelPath = "Assets/Scenes/Level02_FirstBirthday.unity";
-        private const string NextPath = "Assets/Scenes/Level03_Placeholder.unity";
+        private const string NextPath = "Assets/Scenes/Level03_ChildhoodPacking.unity";
         private static Sprite circle, square;
         private static Material material;
         private static Font font;

@@ -18,8 +18,14 @@ EditorBuildSettings:
     path: Assets/Scenes/Level02_FirstBirthday.unity
     guid: c1c46a214764f0a46936217507a41b11
   - enabled: 1
-    path: Assets/Scenes/Level03_Placeholder.unity
+    path: Assets/Scenes/Level03_ChildhoodPacking.unity
     guid: 538aa770dfd830a40b6f50b47c6f7894
+  - enabled: 1
+    path: Assets/Scenes/Level04_AdolescencePiercing.unity
+    guid: 8546d9b74639bd4409eaf10615adc799
+  - enabled: 1
+    path: Assets/Scenes/Level05_ComingOfAge.unity
+    guid: 1e87a5a92c5fe9b4e90b8b1d3ed6ed54
   - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02

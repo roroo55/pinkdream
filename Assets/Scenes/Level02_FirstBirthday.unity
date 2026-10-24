@@ -8114,7 +8114,7 @@ MonoBehaviour:
   rightHandAnchor: {fileID: 263844985}
   feedbackText: {fileID: 1282857799}
   completionHoldSeconds: 2
-  nextScene: Level03_Placeholder
+  nextScene: Level03_ChildhoodPacking
 --- !u!4 &982315815
 Transform:
   m_ObjectHideFlags: 0

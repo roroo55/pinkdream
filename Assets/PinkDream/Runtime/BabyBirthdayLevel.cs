@@ -24,7 +24,7 @@ namespace PinkDream
         [SerializeField] private Text feedbackText;
         [InspectorName("抓到后的展示时间（秒）"), Min(0)]
         [SerializeField] private float completionHoldSeconds = 2f;
-        [SerializeField] private string nextScene = "Level03_Placeholder";
+        [SerializeField] private string nextScene = "Level03_ChildhoodPacking";
 
         private int draggingItem = -1;
         private bool draggingBaby;
