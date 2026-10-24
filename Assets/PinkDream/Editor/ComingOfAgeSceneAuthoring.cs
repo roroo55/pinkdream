@@ -174,23 +174,19 @@ namespace PinkDream.Editor
             Solid(brush, "金属箍", square, new Vector2(0, 0.38f), new Vector2(0.20f, 0.22f), new Color32(175, 184, 197, 255), 212, paths);
             Solid(brush, "黄色笔毛", circle, new Vector2(0, 0.64f), new Vector2(0.28f, 0.37f), Gold, 213, paths);
             choices.Add(Choice(brush, "画笔", paths, candle, ComingOfAgeLevel.DecorationMotion.Still));
-            WorldText(brush, "画笔", new Vector2(0, -0.87f));
             paths = new List<Vector2[]>();
             Transform seed = Group("种子", looseItems, new Vector2(-4.14f, -0.54f));
             Solid(seed, "种子本体", circle, Vector2.zero, new Vector2(0.40f, 0.57f), Green, 211, paths);
             Shape(seed, "种子亮边", circle, new Vector2(-0.055f, 0.07f), new Vector2(0.10f, 0.27f), new Color32(194, 219, 161, 255), 212);
             choices.Add(Choice(seed, "种子", paths, flower, ComingOfAgeLevel.DecorationMotion.Flower));
-            WorldText(seed, "种子", new Vector2(0, -0.58f));
             paths = new List<Vector2[]>();
             Transform starItem = Group("星星", looseItems, new Vector2(-3.75f, -2.15f));
             Solid(starItem, "金色星星", star, Vector2.zero, Vector2.one * 0.68f, Gold, 211, paths);
             choices.Add(Choice(starItem, "星星", paths, floatingStar, ComingOfAgeLevel.DecorationMotion.Star));
-            WorldText(starItem, "星星", new Vector2(0, -0.61f));
             paths = new List<Vector2[]>();
             Transform bowItem = Group("蝴蝶结", looseItems, new Vector2(-1.15f, -2.96f));
             Bow(bowItem, 0.93f, 211, paths);
             choices.Add(Choice(bowItem, "蝴蝶结", paths, creamBow, ComingOfAgeLevel.DecorationMotion.Still));
-            WorldText(bowItem, "蝴蝶结", new Vector2(0, -0.63f));
             paths = new List<Vector2[]>();
             Transform cameraItem = Group("相机", looseItems, new Vector2(0.65f, -2.95f));
             Solid(cameraItem, "相机机身", square, Vector2.zero, new Vector2(0.90f, 0.59f), new Color32(91, 94, 109, 255), 211, paths);
@@ -201,7 +197,6 @@ namespace PinkDream.Editor
             var cameraChoice = Choice(cameraItem, "相机", paths, candy, ComingOfAgeLevel.DecorationMotion.Candy);
             cameraChoice.sparkle = sparkle;
             choices.Add(cameraChoice);
-            WorldText(cameraItem, "相机", new Vector2(0, -0.67f));
 
             Transform cord = Group("装扮完毕 · 向下拉的拉绳", null, new Vector2(5.12f, 2.9f));
             Transform handle = Group("拉绳握环", cord, new Vector2(0, -1.1f));
@@ -219,16 +214,9 @@ namespace PinkDream.Editor
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1600, 900);
             scaler.matchWidthOrHeight = 0.5f;
-            ScreenText(ui.transform, "关卡名称", "05 / 成年礼 · 亲手组合自己的未来", new Vector2(0, -22), 22, true);
             Text preparationHint = ScreenText(ui.transform, "关卡提示", "拿起喜欢的物品，把它变成蛋糕上的装饰", new Vector2(0, -76), 32, true);
             Text combination = ScreenText(ui.transform, "自由组合进度", "已组合 0 种装饰 · 可以继续，也可以随时完成", new Vector2(0, -130), 22, true);
             Text feedback = ScreenText(ui.transform, "操作提示", "拖动女孩的手碰到物品，拿起后把手带到蛋糕旁。", new Vector2(0, 19), 22, false);
-            Text birthday = TextObject(ui.transform, "庆祝中央文字", "成年快乐", 76);
-            birthday.color = new Color32(161, 92, 133, 255);
-            birthday.rectTransform.anchorMin = birthday.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
-            birthday.rectTransform.sizeDelta = new Vector2(1000, 150);
-            birthday.rectTransform.anchoredPosition = new Vector2(0, 28);
-            birthday.gameObject.SetActive(false);
 
             var party = new GameObject("成年礼 · 点亮与彩色庆祝设置").AddComponent<ComingOfAgeCelebration>();
             var partyData = new SerializedObject(party);
@@ -237,7 +225,7 @@ namespace PinkDream.Editor
             Refs(partyData, "happyPose", happyPose);
             Refs(partyData, "neutralFace", neutralFace);
             Ref(partyData, "happyFace", happyFace.gameObject);
-            Ref(partyData, "birthdayText", birthday.gameObject);
+            Ref(partyData, "restartHint", feedback);
             Ref(partyData, "cakeGlow", glow.gameObject);
             Refs(partyData, "flames", flames);
             Transform effects = Group("庆祝时启用 · 彩色礼花与气球", null, Vector2.zero);

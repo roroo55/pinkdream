@@ -42,7 +42,7 @@ namespace PinkDream
 
         private void Update()
         {
-            if (IsComplete)
+            if (IsComplete || SceneFadeTransition.InputBlocked)
                 return;
             Vector2 screen = Input.mousePosition;
             if (!Application.isFocused || !interactionCamera.pixelRect.Contains(screen))
@@ -128,7 +128,7 @@ namespace PinkDream
             // Keep the actual contact pose instead of snapping to a grip point.
             selected.root.SetParent(hand == 3 ? leftHandAnchor : rightHandAnchor, true);
             Physics2D.SyncTransforms();
-            feedbackText.text = "抓到了" + selected.itemName + "，这是你喜欢的呀。";
+            feedbackText.text = "已抓到物品，即将进入下一关。";
             // Only a local display name is used. No preference, career or item
             // flag is persisted; every item advances through the same route.
             StartCoroutine(ContinueToNextLevel());
@@ -139,7 +139,7 @@ namespace PinkDream
             if (completionHoldSeconds > 0)
                 yield return new WaitForSecondsRealtime(completionHoldSeconds);
             if (Application.CanStreamedLevelBeLoaded(nextScene))
-                yield return SceneManager.LoadSceneAsync(nextScene, LoadSceneMode.Single);
+                SceneFadeTransition.Load(nextScene);
             else
                 Debug.LogError("The next scene is missing from Build Settings: " + nextScene, this);
         }

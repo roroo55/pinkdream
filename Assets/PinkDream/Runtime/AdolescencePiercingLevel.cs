@@ -31,6 +31,8 @@ namespace PinkDream
         private readonly CircleCollider2D[] palms = new CircleCollider2D[2];
         private int heldHand = -1;
         private bool dragging;
+        private bool[] pierced;
+        private int piercedCount;
         public bool IsComplete { get; private set; }
 
         private void Awake()
@@ -38,11 +40,13 @@ namespace PinkDream
             girl.ReadMouseInput = false;
             palms[0] = leftHandAnchor.parent.GetComponent<CircleCollider2D>();
             palms[1] = rightHandAnchor.parent.GetComponent<CircleCollider2D>();
+            pierced = new bool[ears.Length];
+            feedbackText.text = "拖动女孩的手拿起穿耳器，完成两侧耳洞（0 / 2）。";
         }
 
         private void Update()
         {
-            if (IsComplete)
+            if (IsComplete || SceneFadeTransition.InputBlocked)
                 return;
             Vector2 screen = Input.mousePosition;
             if (!Application.isFocused || !interactionCamera.pixelRect.Contains(screen))
@@ -99,7 +103,7 @@ namespace PinkDream
                     renderer.sortingOrder = 340 + renderer.sortingOrder % 10;
                 foreach (Canvas label in piercingTool.GetComponentsInChildren<Canvas>())
                     label.enabled = false;
-                feedbackText.text = "让穿耳器的银色前端碰到任一侧耳垂，再松手。";
+                feedbackText.text = "让穿耳器的银色前端碰到耳垂，再松手。两侧都要完成（0 / 2）。";
                 return;
             }
         }
@@ -111,15 +115,25 @@ namespace PinkDream
             girl.EndControlledDrag();
             if (!confirm || !wasDragging || heldHand < 0 || IsComplete)
                 return;
-            foreach (EarTarget ear in ears)
+            for (int i = 0; i < ears.Length; i++)
             {
+                if (pierced[i])
+                    continue;
+                EarTarget ear = ears[i];
                 ColliderDistance2D contact = toolTip.Distance(ear.lobe);
                 if (!contact.isValid || contact.distance > 0f)
                     continue;
-                IsComplete = true;
+                pierced[i] = true;
+                piercedCount++;
                 // The symbolic result is pre-authored on the head, without injury effects.
                 ear.earring.SetActive(true);
-                feedbackText.text = "这是我自己的选择。";
+                if (piercedCount < ears.Length)
+                {
+                    feedbackText.text = "已完成一侧耳洞（1 / 2），继续完成另一侧。";
+                    return;
+                }
+                IsComplete = true;
+                feedbackText.text = "两侧耳洞已完成（2 / 2），即将进入下一关。";
                 StartCoroutine(ContinueToNextLevel());
                 return;
             }
@@ -130,7 +144,7 @@ namespace PinkDream
             if (completionHoldSeconds > 0)
                 yield return new WaitForSecondsRealtime(completionHoldSeconds);
             if (!string.IsNullOrEmpty(nextScene) && Application.CanStreamedLevelBeLoaded(nextScene))
-                yield return SceneManager.LoadSceneAsync(nextScene, LoadSceneMode.Single);
+                SceneFadeTransition.Load(nextScene);
         }
 
         private void OnApplicationFocus(bool focused)

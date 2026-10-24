@@ -12,14 +12,20 @@ namespace PinkDream
 
         private IEnumerator Start()
         {
+            string destination = SceneFadeTransition.TakeDestination(nextScene);
+            if (SceneFadeTransition.PendingBackground.HasValue)
+                Camera.main.backgroundColor = SceneFadeTransition.PendingBackground.Value;
             if (blankHoldSeconds > 0)
                 yield return new WaitForSecondsRealtime(blankHoldSeconds);
-            if (!string.IsNullOrWhiteSpace(nextScene))
+            if (!string.IsNullOrWhiteSpace(destination))
             {
-                if (Application.CanStreamedLevelBeLoaded(nextScene))
-                    yield return SceneManager.LoadSceneAsync(nextScene, LoadSceneMode.Single);
+                if (Application.CanStreamedLevelBeLoaded(destination))
+                {
+                    SceneFadeTransition.PrepareArrival(destination);
+                    yield return SceneManager.LoadSceneAsync(destination, LoadSceneMode.Single);
+                }
                 else
-                    Debug.LogError("The next scene is missing from Build Settings: " + nextScene, this);
+                    Debug.LogError("The next scene is missing from Build Settings: " + destination, this);
             }
         }
     }

@@ -47,6 +47,8 @@ namespace PinkDream
 
         private void Update()
         {
+            if (SceneFadeTransition.InputBlocked)
+                return;
             if (step == Step.Revealed)
             {
                 if (completionSequence != null)

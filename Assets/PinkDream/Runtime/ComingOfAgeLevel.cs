@@ -73,7 +73,7 @@ namespace PinkDream
         private void Update()
         {
             AnimateDecorations();
-            if (HasFinished)
+            if (HasFinished || SceneFadeTransition.InputBlocked)
                 return;
             Vector2 screen = Input.mousePosition;
             if (!Application.isFocused || !interactionCamera.pixelRect.Contains(screen))
@@ -215,7 +215,7 @@ namespace PinkDream
             finishControl.SetActive(false);
             foreach (GameObject hint in preparationHints)
                 hint.SetActive(false);
-            feedbackText.text = "未来，由你亲手组合。";
+            feedbackText.text = string.Empty;
             celebration.Begin();
         }
 

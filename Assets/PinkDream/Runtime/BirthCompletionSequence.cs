@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace PinkDream
 {
-    /// <summary>Only the completed level's celebration, dialogue and scene exit.</summary>
+    /// <summary>Only the completed level's celebration and scene exit.</summary>
     public sealed class BirthCompletionSequence : MonoBehaviour
     {
         [Header("场景中预放的礼花与气球")]
@@ -36,20 +36,13 @@ namespace PinkDream
         [SerializeField] private float celebrationHoldSeconds = 1f;
         [InspectorName("减淡消失时间（秒）"), Min(0)]
         [SerializeField] private float celebrationFadeSeconds = 0.85f;
-        [Header("对话")]
-        [SerializeField] private CanvasGroup dialogueGroup;
-        [SerializeField] private Text dialogueText;
-        [TextArea, SerializeField] private string dialogueLine = "哦，亲爱的，是女孩。";
-        [InspectorName("对话出现时间（秒）"), Min(0)]
-        [SerializeField] private float dialogueFadeSeconds = 0.25f;
-        [InspectorName("对话停留时间（秒）"), Min(0)]
-        [SerializeField] private float dialogueHoldSeconds = 2.5f;
         [Header("以游戏背景色转入独立空白场景")]
         [InspectorName("背景色转场遮罩")]
         [SerializeField] private CanvasGroup whiteCover;
         [InspectorName("画面淡出时间（秒）"), Min(0)]
         [SerializeField] private float sceneFadeSeconds = 0.7f;
         [SerializeField] private string transitionScene = "Transition_Blank";
+        [SerializeField] private string nextScene = "Level02_FirstBirthday";
 
         private readonly List<SpriteRenderer> balloonSprites = new List<SpriteRenderer>();
         private readonly List<Color> spriteColors = new List<Color>();
@@ -202,20 +195,6 @@ namespace PinkDream
                 if (balloon != null)
                     balloon.gameObject.SetActive(false);
 
-            dialogueText.text = dialogueLine;
-            dialogueGroup.alpha = 0;
-            dialogueGroup.gameObject.SetActive(true);
-            elapsed = 0;
-            while (elapsed < dialogueFadeSeconds)
-            {
-                elapsed += Time.unscaledDeltaTime;
-                dialogueGroup.alpha = Mathf.SmoothStep(0, 1, Mathf.Clamp01(elapsed / dialogueFadeSeconds));
-                yield return null;
-            }
-            dialogueGroup.alpha = 1;
-            if (dialogueHoldSeconds > 0)
-                yield return new WaitForSecondsRealtime(dialogueHoldSeconds);
-
             whiteCover.alpha = 0;
             whiteCover.gameObject.SetActive(true);
             elapsed = 0;
@@ -224,12 +203,11 @@ namespace PinkDream
                 elapsed += Time.unscaledDeltaTime;
                 float alpha = Mathf.SmoothStep(0, 1, Mathf.Clamp01(elapsed / sceneFadeSeconds));
                 whiteCover.alpha = alpha;
-                dialogueGroup.alpha = 1 - alpha;
                 yield return null;
             }
             whiteCover.alpha = 1;
             if (Application.CanStreamedLevelBeLoaded(transitionScene))
-                yield return SceneManager.LoadSceneAsync(transitionScene, LoadSceneMode.Single);
+                SceneFadeTransition.Load(nextScene, true, transitionScene);
             else
                 Debug.LogError("The transition scene is missing from Build Settings: " + transitionScene, this);
         }

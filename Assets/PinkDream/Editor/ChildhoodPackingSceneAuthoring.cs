@@ -100,7 +100,6 @@ namespace PinkDream.Editor
             bagInterior.size = new Vector2(2.12f, 1.76f);
             Transform packedRoot = Group("已放入的物品", bag, Vector2.zero);
             WorldText(bag, "把物品放在这里\n松手收好", new Vector2(0, 0.17f), 22, 180);
-            WorldText(bag, "粉色书包", new Vector2(0, -1.86f), 24, 180);
 
             var objects = new List<ChildhoodPackingLevel.PackingItem>();
             var paths = new List<Vector2[]>();
@@ -115,7 +114,6 @@ namespace PinkDream.Editor
             Shape(doll, "玩偶右眼", circle, new Vector2(0.12f, 0.42f), Vector2.one * 0.05f, Ink, 214);
             Shape(doll, "玩偶微笑", circle, new Vector2(0, 0.25f), new Vector2(0.08f, 0.035f), DeepPink, 214);
             objects.Add(Record(doll, "粉色布娃娃", paths));
-            WorldText(doll, "布娃娃", new Vector2(0, -0.97f), 23, 230);
 
             paths = new List<Vector2[]>();
             Transform pencil = Group("粉色铅笔", null, new Vector2(-2.85f, -2.30f));
@@ -126,14 +124,12 @@ namespace PinkDream.Editor
             // A small diamond supplies a geometric pencil tip without a new art asset.
             Solid(pencilVisual, "粉色笔尖", square, new Vector2(0, 0.58f), new Vector2(0.18f, 0.18f), DeepPink, 212, paths, pencil, 45);
             objects.Add(Record(pencil, "粉色铅笔", paths));
-            WorldText(pencil, "铅笔", new Vector2(0, -0.61f), 23, 230);
 
             paths = new List<Vector2[]>();
             Transform eraser = Group("粉色橡皮", null, new Vector2(-0.85f, -2.72f));
             Solid(eraser, "橡皮本体", square, Vector2.zero, new Vector2(0.75f, 0.43f), LightPink, 211, paths, eraser, -10);
             Shape(eraser, "橡皮纸套", square, Vector2.zero, new Vector2(0.29f, 0.43f), DeepPink, 212).transform.localRotation = Quaternion.Euler(0, 0, -10);
             objects.Add(Record(eraser, "粉色橡皮", paths));
-            WorldText(eraser, "橡皮", new Vector2(0, -0.52f), 23, 230);
 
             paths = new List<Vector2[]>();
             Transform notebook = Group("粉色笔记本", null, new Vector2(1.13f, -2.14f));
@@ -143,7 +139,6 @@ namespace PinkDream.Editor
             Shape(notebook, "封面横线", square, new Vector2(0.04f, 0.12f), new Vector2(0.40f, 0.025f), DeepPink, 213);
             Shape(notebook, "封面下横线", square, new Vector2(0.04f, -0.05f), new Vector2(0.40f, 0.025f), DeepPink, 213);
             objects.Add(Record(notebook, "粉色笔记本", paths));
-            WorldText(notebook, "笔记本", new Vector2(0, -0.82f), 23, 230);
 
             paths = new List<Vector2[]>();
             Transform book = Group("粉色故事书", null, new Vector2(-3.65f, 1.66f));
@@ -153,7 +148,6 @@ namespace PinkDream.Editor
             Shape(book, "封面小圆点", circle, new Vector2(0.06f, 0.11f), Vector2.one * 0.22f, Pink, 213);
             Shape(book, "书页下缘", square, new Vector2(0.04f, -0.49f), new Vector2(0.74f, 0.06f), LightPink, 213);
             objects.Add(Record(book, "粉色故事书", paths));
-            WorldText(book, "故事书", new Vector2(0, -0.90f), 23, 230);
 
             var canvasObject = new GameObject("童年 · 可编辑提示", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
             canvasObject.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
@@ -161,7 +155,6 @@ namespace PinkDream.Editor
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1600, 900);
             scaler.matchWidthOrHeight = 0.5f;
-            ScreenText(canvasObject.transform, "关卡名称", "03 / 童年 · 女孩喜欢粉色", new Vector2(0, -22), 22, true);
             ScreenText(canvasObject.transform, "关卡提示", "整理书包：把粉色的东西全部装进去", new Vector2(0, -76), 33, true);
             Text progress = ScreenText(canvasObject.transform, "整理进度", "整理书包  0 / 5", new Vector2(0, -130), 23, true);
             Text feedback = ScreenText(canvasObject.transform, "操作提示", "拖动女孩的手拿起物品，放进书包里，再松手。", new Vector2(0, 22), 23, false);

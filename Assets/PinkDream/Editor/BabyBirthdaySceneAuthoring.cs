@@ -101,7 +101,6 @@ namespace PinkDream.Editor
             Bar(scissors, "右剪刀刃", new Vector2(0.10f, -0.02f), new Vector2(-0.33f, 0.63f), 0.085f, new Color32(207, 217, 222, 255), 203);
             Shape(scissors, "转轴", circle, new Vector2(0, 0.15f), Vector2.one * 0.14f, Ink, 204);
             objects.Add(Record(scissors, "剪刀", new Vector2(-0.24f, -0.23f)));
-            WorldText(scissors, "剪刀", new Vector2(0, -0.86f), 24);
 
             Transform mouse = ItemRoot("鼠标", new Vector2(-2.15f, -1.95f));
             Shape(mouse, "鼠标轮廓", circle, Vector2.zero, new Vector2(0.78f, 1.02f), Ink, 201);
@@ -110,7 +109,6 @@ namespace PinkDream.Editor
             Shape(mouse, "滚轮", circle, new Vector2(0, 0.17f), new Vector2(0.095f, 0.19f), Cream, 204);
             Line(mouse, "鼠标线", new[] { new Vector3(0, 0.48f, 0), new Vector3(0, 0.67f, 0), new Vector3(0.16f, 0.82f, 0), new Vector3(0.31f, 0.77f, 0) }, 0.025f, Ink, 200);
             objects.Add(Record(mouse, "鼠标", Vector2.zero));
-            WorldText(mouse, "鼠标", new Vector2(0, -0.85f), 24);
 
             Transform brush = ItemRoot("画笔", new Vector2(0, -2.48f));
             Transform brushVisual = Group("倾斜画笔", brush, Vector3.zero);
@@ -123,7 +121,6 @@ namespace PinkDream.Editor
             var brushRecord = Record(brush, "画笔", Vector2.zero);
             brushRecord.gripPoint.position = brushVisual.TransformPoint(new Vector3(0, -0.18f, 0));
             objects.Add(brushRecord);
-            WorldText(brush, "画笔", new Vector2(0, -0.87f), 24);
 
             Transform envelope = ItemRoot("红包", new Vector2(2.15f, -1.95f));
             Shape(envelope, "红包轮廓", square, Vector2.zero, new Vector2(0.90f, 1.30f), Ink, 201);
@@ -133,7 +130,6 @@ namespace PinkDream.Editor
             SpriteRenderer emblem = Shape(envelope, "金色封印", square, new Vector2(0, -0.07f), Vector2.one * 0.36f, new Color32(249, 204, 136, 255), 203);
             emblem.transform.localRotation = Quaternion.Euler(0, 0, 45);
             objects.Add(Record(envelope, "红包", new Vector2(0, -0.2f)));
-            WorldText(envelope, "红包", new Vector2(0, -0.96f), 24);
 
             Transform ukulele = ItemRoot("尤克里里", new Vector2(3.55f, -0.45f));
             Shape(ukulele, "琴身下部轮廓", circle, new Vector2(0, -0.22f), new Vector2(0.90f, 0.91f), Ink, 201);
@@ -147,10 +143,8 @@ namespace PinkDream.Editor
             for (int i = 0; i < 4; i++)
                 Shape(ukulele, "琴弦 " + (i + 1), square, new Vector2(-0.051f + i * 0.034f, 0.42f), new Vector2(0.009f, 1.48f), Cream, 205);
             objects.Add(Record(ukulele, "尤克里里", new Vector2(0, 0.67f)));
-            WorldText(ukulele, "尤克里里", new Vector2(0, -1.03f), 24);
 
             Canvas ui = ScreenCanvas();
-            ScreenText(ui.transform, "关卡名称", "02 / 婴儿周岁抓周", new Vector2(0, -22), 22, true);
             ScreenText(ui.transform, "关卡提示", "抓住你喜欢的东西吧。", new Vector2(0, -76), 36, true);
             Text feedback = ScreenText(ui.transform, "抓取反馈", "拖动宝宝的手，或把喜欢的小物件送到手边。", new Vector2(0, 24), 22, false);
             var controller = new GameObject("周岁抓周 · 任意物品即可通关").AddComponent<BabyBirthdayLevel>();

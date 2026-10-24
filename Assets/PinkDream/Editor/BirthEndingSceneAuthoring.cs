@@ -57,7 +57,7 @@ namespace PinkDream.Editor
             WriteArray(levelData, "pinkBalloons", balloons);
 
             var ending = new GameObject("出生前 · 完成演出与时间设置").AddComponent<BirthCompletionSequence>();
-            var ui = new GameObject("完成演出 · 可编辑对话与转场", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
+            var ui = new GameObject("完成演出 · 可编辑转场", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
             var canvas = ui.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = 700;
@@ -65,36 +65,6 @@ namespace PinkDream.Editor
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1600, 900);
             scaler.matchWidthOrHeight = 0.5f;
-
-            var dialogue = new GameObject("对话 · 哦，亲爱的，是女孩。", typeof(RectTransform), typeof(CanvasGroup), typeof(CanvasRenderer), typeof(Image));
-            dialogue.transform.SetParent(ui.transform, false);
-            RectTransform dialogueRect = dialogue.GetComponent<RectTransform>();
-            dialogueRect.anchorMin = dialogueRect.anchorMax = new Vector2(0.5f, 0);
-            dialogueRect.pivot = new Vector2(0.5f, 0);
-            dialogueRect.anchoredPosition = new Vector2(0, 80);
-            dialogueRect.sizeDelta = new Vector2(1050, 160);
-            dialogue.GetComponent<Image>().color = new Color(1f, 0.98f, 0.97f, 0.96f);
-            dialogue.GetComponent<Image>().raycastTarget = false;
-            CanvasGroup dialogueGroup = dialogue.GetComponent<CanvasGroup>();
-            dialogueGroup.alpha = 1;
-            dialogueGroup.interactable = false;
-            dialogueGroup.blocksRaycasts = false;
-
-            var textObject = new GameObject("对话文本", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
-            textObject.transform.SetParent(dialogue.transform, false);
-            RectTransform textRect = textObject.GetComponent<RectTransform>();
-            textRect.anchorMin = Vector2.zero;
-            textRect.anchorMax = Vector2.one;
-            textRect.offsetMin = new Vector2(40, 24);
-            textRect.offsetMax = new Vector2(-40, -24);
-            Text text = textObject.GetComponent<Text>();
-            text.text = "哦，亲爱的，是女孩。";
-            text.font = AssetDatabase.LoadAssetAtPath<Font>("Assets/PinkDream/Geometry/SceneUIFont.ttf");
-            text.fontSize = 36;
-            text.color = new Color32(91, 54, 73, 255);
-            text.alignment = TextAnchor.MiddleCenter;
-            text.raycastTarget = false;
-            dialogue.SetActive(false);
 
             var cover = new GameObject("转场 · 全屏背景色遮罩", typeof(RectTransform), typeof(CanvasGroup), typeof(CanvasRenderer), typeof(Image));
             cover.transform.SetParent(ui.transform, false);
@@ -112,8 +82,6 @@ namespace PinkDream.Editor
             endingData.FindProperty("sceneCamera").objectReferenceValue = camera;
             WriteArray(endingData, "confetti", particles);
             WriteArray(endingData, "balloons", balloons);
-            endingData.FindProperty("dialogueGroup").objectReferenceValue = dialogueGroup;
-            endingData.FindProperty("dialogueText").objectReferenceValue = text;
             endingData.FindProperty("whiteCover").objectReferenceValue = coverGroup;
             endingData.ApplyModifiedPropertiesWithoutUndo();
             levelData.FindProperty("completionSequence").objectReferenceValue = ending;
@@ -144,7 +112,7 @@ namespace PinkDream.Editor
             }
             EditorBuildSettings.scenes = buildScenes.ToArray();
             AssetDatabase.SaveAssets();
-            Debug.Log("Birth ending authored: fullscreen celebration, editable 1s hold, fade, dialogue, blank transition and next-scene placeholder. No Play mode or tests executed.");
+            Debug.Log("Birth ending authored: fullscreen celebration, editable 1s hold, fade and blank transition. No Play mode or tests executed.");
         }
 
         public static void SaveAuthoredEnding()
@@ -153,7 +121,7 @@ namespace PinkDream.Editor
             var ending = Object.FindObjectOfType<BirthCompletionSequence>();
             var data = new SerializedObject(ending);
             // Hidden at first, but immediately visible if enabled while editing.
-            foreach (string field in new[] { "dialogueGroup", "whiteCover" })
+            foreach (string field in new[] { "whiteCover" })
             {
                 var group = (CanvasGroup)data.FindProperty(field).objectReferenceValue;
                 group.alpha = 1;

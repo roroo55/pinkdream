@@ -47,7 +47,7 @@ namespace PinkDream
 
         private void Update()
         {
-            if (IsComplete)
+            if (IsComplete || SceneFadeTransition.InputBlocked)
                 return;
             Vector2 screen = Input.mousePosition;
             if (!Application.isFocused || !interactionCamera.pixelRect.Contains(screen))
@@ -148,7 +148,7 @@ namespace PinkDream
             if (packedCount != items.Length)
                 return;
             IsComplete = true;
-            feedbackText.text = "全部装好了！";
+            feedbackText.text = "已全部收好，即将进入下一关。";
             StartCoroutine(ContinueToNextLevel());
         }
 
@@ -165,7 +165,7 @@ namespace PinkDream
             if (completionHoldSeconds > 0)
                 yield return new WaitForSecondsRealtime(completionHoldSeconds);
             if (!string.IsNullOrEmpty(nextScene) && Application.CanStreamedLevelBeLoaded(nextScene))
-                yield return SceneManager.LoadSceneAsync(nextScene, LoadSceneMode.Single);
+                SceneFadeTransition.Load(nextScene);
         }
 
         private void OnApplicationFocus(bool focused)

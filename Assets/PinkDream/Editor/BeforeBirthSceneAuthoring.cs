@@ -64,7 +64,6 @@ namespace PinkDream.Editor
             SetOverlay(character, false);
             Camera.main.orthographicSize = 4.1f;
             Canvas canvas = ScreenCanvas("开始界面 · 可编辑文字");
-            Label(canvas.transform, "游戏名称", "Pink Dream", new Vector2(0, -40), new Vector2(1200, 70), 40);
             Label(canvas.transform, "拖拽提示", "拖动手到 START，开始游戏", new Vector2(0, -125), new Vector2(1200, 60), 28);
 
             Transform target = Group("START · 把手拖到这里", null, new Vector3(2.8f, -0.55f, 0));
@@ -104,7 +103,6 @@ namespace PinkDream.Editor
             Camera camera = Camera.main;
             camera.orthographicSize = 4.4f;
             Canvas canvas = ScreenCanvas("出生前 · 顶部提示");
-            Label(canvas.transform, "关卡标题", "01 / 出生前", new Vector2(0, -20), new Vector2(1200, 35), 18);
             Label(canvas.transform, "顶部文字提示", "手牵手，一起握刀切开蛋糕", new Vector2(0, -66), new Vector2(1450, 75), 36);
 
             Transform table = Group("桌子", null, Vector3.zero);

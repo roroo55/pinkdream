@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace PinkDream
 {
@@ -10,7 +11,7 @@ namespace PinkDream
         [SerializeField] private Transform[] happyPose;
         [SerializeField] private GameObject[] neutralFace;
         [SerializeField] private GameObject happyFace;
-        [SerializeField] private GameObject birthdayText;
+        [SerializeField] private Text restartHint;
         [SerializeField] private GameObject cakeGlow;
         [SerializeField] private GameObject[] flames;
         [SerializeField] private ParticleSystem[] confetti;
@@ -37,6 +38,7 @@ namespace PinkDream
         private Vector2 startTorso;
         private float age;
         private bool poseFinished, effectsFinished, emissionStopped;
+        private bool returnPromptShown, returnClickArmed, returning;
         private MaterialPropertyBlock fadeBlock;
         private static readonly int Tint = Shader.PropertyToID("_Color");
         public bool HasStarted { get; private set; }
@@ -54,7 +56,6 @@ namespace PinkDream
             foreach (GameObject face in neutralFace)
                 face.SetActive(false);
             happyFace.SetActive(true);
-            birthdayText.SetActive(true);
             cakeGlow.SetActive(true);
             foreach (GameObject flame in flames)
                 flame.SetActive(true);
@@ -102,6 +103,72 @@ namespace PinkDream
                 AnimateHappyPose();
             if (!effectsFinished)
                 AnimateEffects();
+            UpdateReturnToStart();
+        }
+
+        private void UpdateReturnToStart()
+        {
+            if (!poseFinished || !effectsFinished || returning || SceneFadeTransition.InputBlocked)
+                return;
+            if (!returnPromptShown)
+            {
+                returnPromptShown = true;
+                if (restartHint != null)
+                    restartHint.text = "点击空白处，返回 Start 重新开始游戏。";
+            }
+            // Releasing the finish cord is never treated as the restart click.
+            if (!Input.GetMouseButton(0))
+                returnClickArmed = true;
+            Vector2 screen = Input.mousePosition;
+            if (!returnClickArmed || !Input.GetMouseButtonDown(0) || !Application.isFocused ||
+                !sceneCamera.pixelRect.Contains(screen) || !IsBlankPoint(screen))
+                return;
+            returning = SceneFadeTransition.Load("Start");
+        }
+
+        private bool IsBlankPoint(Vector2 screen)
+        {
+            Vector2 world = girl.ScreenToWorld(screen);
+            foreach (SpriteRenderer sprite in FindObjectsOfType<SpriteRenderer>())
+                if (sprite.enabled && sprite.sortingOrder >= 0 && sprite.color.a > 0.05f && Contains(sprite.bounds, world) && HitsSprite(sprite, world))
+                    return false;
+            foreach (LineRenderer line in FindObjectsOfType<LineRenderer>())
+                if (line.enabled && line.sortingOrder >= 0 && line.startColor.a > 0.05f && Contains(line.bounds, world))
+                    return false;
+            foreach (Text text in FindObjectsOfType<Text>())
+            {
+                if (!text.enabled || string.IsNullOrWhiteSpace(text.text) || text.canvas == null || !text.canvas.isActiveAndEnabled)
+                    continue;
+                Camera uiCamera = text.canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null :
+                    (text.canvas.worldCamera != null ? text.canvas.worldCamera : sceneCamera);
+                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(text.rectTransform, screen, uiCamera, out Vector2 local))
+                {
+                    Rect rect = text.rectTransform.rect;
+                    Vector2 size = new Vector2(Mathf.Min(rect.width, text.preferredWidth), Mathf.Min(rect.height, text.preferredHeight));
+                    if (new Rect(rect.center - size * 0.5f, size).Contains(local))
+                        return false;
+                }
+            }
+            return true;
+        }
+
+        private static bool Contains(Bounds bounds, Vector2 point) =>
+            point.x >= bounds.min.x && point.x <= bounds.max.x && point.y >= bounds.min.y && point.y <= bounds.max.y;
+
+        private static bool HitsSprite(SpriteRenderer renderer, Vector2 world)
+        {
+            Sprite sprite = renderer.sprite;
+            if (sprite == null)
+                return false;
+            if (!sprite.texture.isReadable)
+                return true;
+            Vector2 local = renderer.transform.InverseTransformPoint(new Vector3(world.x, world.y, renderer.transform.position.z));
+            if (renderer.flipX) local.x = -local.x;
+            if (renderer.flipY) local.y = -local.y;
+            Vector2 pixel = local * sprite.pixelsPerUnit + sprite.pivot + sprite.rect.position;
+            if (!sprite.rect.Contains(pixel))
+                return false;
+            return sprite.texture.GetPixelBilinear(pixel.x / sprite.texture.width, pixel.y / sprite.texture.height).a > 0.05f;
         }
 
         private void AnimateHappyPose()
@@ -174,7 +241,7 @@ namespace PinkDream
                 particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             foreach (Transform balloon in balloons)
                 balloon.gameObject.SetActive(false);
-            // The lit cake, chosen combination, birthday text and happy pose remain.
+            // The lit cake, chosen combination and happy pose remain.
         }
     }
 }

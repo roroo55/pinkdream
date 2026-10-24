@@ -62,7 +62,7 @@ namespace PinkDream
 
         private void Update()
         {
-            if (!initialized || loading)
+            if (!initialized || loading || SceneFadeTransition.InputBlocked)
                 return;
             Vector2 screen = Input.mousePosition;
             Camera camera = Camera.main;
@@ -182,9 +182,8 @@ namespace PinkDream
             alignedLastFrame = true;
             if (dwellTime < Mathf.Max(1, revealHoldSeconds))
                 return;
-            loading = true;
             EndGesture();
-            SceneManager.LoadSceneAsync(firstLevelScene, LoadSceneMode.Single);
+            loading = SceneFadeTransition.Load(firstLevelScene);
         }
 
         private void ResetDiscovery()

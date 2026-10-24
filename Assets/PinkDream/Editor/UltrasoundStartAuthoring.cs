@@ -118,8 +118,7 @@ namespace PinkDream.Editor
 
             CanvasGroup found = FoundStartLabel(lens, camera);
             Canvas canvas = ScreenCanvas();
-            ScreenText(canvas.transform, "游戏名称", "Pink Dream", new Vector2(0, -26), new Vector2(1400, 65), 44, true);
-            ScreenText(canvas.transform, "开始提示", "拖动放大镜，找到小小的她。", new Vector2(0, -99), new Vector2(1400, 52), 27, true);
+            ScreenText(canvas.transform, "开始提示", "拖动放大镜，在 B 超屏幕上找到 START。", new Vector2(0, -99), new Vector2(1400, 52), 27, true);
             Text hint = ScreenText(canvas.transform, "操作说明", "把旁边的放大镜拖到 B 超屏幕上，父母也可以拖动。", new Vector2(0, 28), new Vector2(1480, 50), 22, false);
 
             var controller = new GameObject("Start · 发现与停留时间设置").AddComponent<StartSceneController>();
