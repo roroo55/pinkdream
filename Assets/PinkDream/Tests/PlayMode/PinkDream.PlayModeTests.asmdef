@@ -1,6 +1,6 @@
 {
     "name": "PinkDream.PlayModeTests",
     "rootNamespace": "PinkDream.Tests",
-    "references": ["PinkDream.Runtime"],
+    "references": ["PinkDream.Runtime", "UnityEngine.UI"],
     "optionalUnityReferences": ["TestAssemblies"]
 }

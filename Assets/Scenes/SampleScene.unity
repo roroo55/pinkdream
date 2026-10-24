@@ -4023,6 +4023,7 @@ MonoBehaviour:
   - {fileID: 700663618}
   - {fileID: 137986656}
   visualRoot: {fileID: 247937214}
+  showPrototypeOverlay: 1
 --- !u!1 &780086317
 GameObject:
   m_ObjectHideFlags: 0

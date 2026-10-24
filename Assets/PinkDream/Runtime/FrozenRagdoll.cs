@@ -14,6 +14,12 @@ namespace PinkDream
         private readonly List<Object> ownedAssets = new List<Object>();
         [SerializeField] private List<SpriteRenderer> bodyColors = new List<SpriteRenderer>();
         [SerializeField] private Transform visualRoot;
+        [SerializeField] private bool showPrototypeOverlay = true;
+        [Header("人物体型（成人保持默认值）")]
+        [SerializeField, Min(0.1f)] private float bodyScale = 1;
+        [SerializeField, Min(0.5f)] private float headScale = 1;
+        [SerializeField] private bool seatedRestPose;
+        private readonly List<Color> initialPartColors = new List<Color>();
 #if UNITY_EDITOR
         private Sprite circle, square;
         private Material material;
@@ -39,7 +45,7 @@ namespace PinkDream
                 return;
             }
 
-            Model = new PoseRagdollModel(transform.position);
+            Model = CreateModel();
             if (!BindSceneGeometry())
             {
                 enabled = false;
@@ -67,11 +73,16 @@ namespace PinkDream
                 }
                 Model.Parts[i].Position = view.position;
                 Model.Parts[i].Angle = view.eulerAngles.z * Mathf.Deg2Rad;
+                initialPartColors.Add(bodyColors[i].color);
                 foreach (Collider2D collider in view.GetComponents<Collider2D>())
                     pickers.Add(collider, i);
             }
+            Model.AlignHeadWithTorso();
             return true;
         }
+
+        private PoseRagdollModel CreateModel()
+            => new PoseRagdollModel(transform.position, bodyScale, headScale, seatedRestPose);
 
         private void Update()
         {
@@ -142,6 +153,32 @@ namespace PinkDream
             Physics2D.SyncTransforms();
         }
 
+        // Level interactions use the same grab point and pose solver as the
+        // original mouse input; they only coordinate which character is held.
+        public void BeginControlledDrag(int part, Vector2 pointer)
+        {
+            Model.BeginDrag(part, pointer);
+            SetHighlight(part);
+        }
+
+        public void MoveControlledDrag(Vector2 pointer)
+        {
+            if (Model.MoveDrag(pointer))
+                RefreshPose();
+        }
+
+        public void EndControlledDrag()
+        {
+            Model?.EndDrag();
+            SetHighlight(-1);
+        }
+
+        public Vector2 HandPosition(int forearm)
+        {
+            PoseRagdollModel.Part part = Model.Parts[forearm];
+            return part.WorldPoint(new Vector2(0, -part.Length * 0.5f));
+        }
+
         private void OnApplicationFocus(bool focused)
         {
             if (!focused)
@@ -160,6 +197,24 @@ namespace PinkDream
         }
 
 #if UNITY_EDITOR
+        public void PoseHandInEditor(int hand, Vector2 destination)
+        {
+            Model = CreateModel();
+            for (int i = 0; i < partViews.Count; i++)
+            {
+                Model.Parts[i].Position = partViews[i].position;
+                Model.Parts[i].Angle = partViews[i].eulerAngles.z * Mathf.Deg2Rad;
+            }
+            Model.AlignHeadWithTorso();
+            PoseRagdollModel.Part forearm = Model.Parts[hand];
+            Model.BeginDrag(hand, forearm.WorldPoint(new Vector2(0, -forearm.Length * 0.5f)));
+            Model.MoveDrag(destination);
+            Model.EndDrag();
+            RefreshPose();
+            foreach (Transform part in partViews)
+                UnityEditor.EditorUtility.SetDirty(part);
+        }
+
         // Authoring only: never called by Awake or included in a player build.
         public void BakeSceneGeometry()
         {
@@ -167,7 +222,7 @@ namespace PinkDream
                 throw new System.InvalidOperationException("Bake character geometry in Edit mode only.");
             if (transform.Find("Geometric ragdoll") != null)
                 throw new System.InvalidOperationException("The scene already contains the character geometry.");
-            Model = new PoseRagdollModel(transform.position);
+            Model = CreateModel();
             partViews.Clear();
             bodyColors.Clear();
             pickers.Clear();
@@ -179,6 +234,8 @@ namespace PinkDream
             circle = MakeSprite(true);
             square = MakeSprite(false);
             Shader shader = geometryShader != null ? geometryShader : Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit-Default");
+            float scale = Mathf.Max(0.1f, bodyScale);
+            float faceScale = scale * Mathf.Max(0.5f, headScale);
             string materialPath = folder + "/RagdollGeometry.mat";
             material = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(materialPath);
             if (material == null)
@@ -198,28 +255,29 @@ namespace PinkDream
                 SpriteRenderer primary;
                 if (part.IsCircle)
                 {
-                    Disc(view, "Head outline", Vector2.zero, part.Width + 0.05f, Ink, 110);
+                    Disc(view, "Head outline", Vector2.zero, part.Width + 0.05f * scale, Ink, 110);
                     primary = Disc(view, "Head", Vector2.zero, part.Width, fill, 111);
-                    Capsule(view, "Neck outline", new Vector2(0, -0.62f), 0.19f, 0.4f, Ink, 5);
-                    Capsule(view, "Neck", new Vector2(0, -0.62f), 0.14f, 0.37f, Skin, 6);
-                    Disc(view, "Left eye", new Vector2(-0.17f, 0.05f), 0.07f, Ink, 113);
-                    Disc(view, "Right eye", new Vector2(0.17f, 0.05f), 0.07f, Ink, 113);
-                    Shape(view, "Mouth", square, new Vector2(0, -0.17f), new Vector2(0.13f, 0.035f), Ink, 113);
+                    Vector2 neckCenter = new Vector2(0, -part.Width * 0.5f - 0.1f * scale);
+                    Capsule(view, "Neck outline", neckCenter, 0.19f * scale, 0.4f * scale, Ink, 5);
+                    Capsule(view, "Neck", neckCenter, 0.14f * scale, 0.37f * scale, Skin, 6);
+                    Disc(view, "Left eye", new Vector2(-0.17f, 0.05f) * faceScale, 0.07f * faceScale, Ink, 113);
+                    Disc(view, "Right eye", new Vector2(0.17f, 0.05f) * faceScale, 0.07f * faceScale, Ink, 113);
+                    Shape(view, "Mouth", square, new Vector2(0, -0.17f) * faceScale, new Vector2(0.13f, 0.035f) * faceScale, Ink, 113);
                     var collider = view.gameObject.AddComponent<CircleCollider2D>();
-                    collider.radius = part.Width * 0.5f + 0.03f;
+                    collider.radius = part.Width * 0.5f + 0.03f * scale;
                     pickers.Add(collider, i);
                     var neck = view.gameObject.AddComponent<CapsuleCollider2D>();
-                    neck.offset = new Vector2(0, -0.62f);
-                    neck.size = new Vector2(0.2f, 0.4f);
+                    neck.offset = neckCenter;
+                    neck.size = new Vector2(0.2f, 0.4f) * scale;
                     pickers.Add(neck, i);
                 }
                 else
                 {
-                    float height = part.Length + (i == 0 ? 0.24f : part.Width);
-                    Capsule(view, "Outline", Vector2.zero, part.Width + 0.05f, height + 0.05f, Ink, order);
+                    float height = part.Length + (i == 0 ? 0.24f * scale : part.Width);
+                    Capsule(view, "Outline", Vector2.zero, part.Width + 0.05f * scale, height + 0.05f * scale, Ink, order);
                     primary = Capsule(view, "Body", Vector2.zero, part.Width, height, fill, order + 1);
                     var collider = view.gameObject.AddComponent<CapsuleCollider2D>();
-                    collider.size = new Vector2(part.Width + 0.04f, height + 0.04f);
+                    collider.size = new Vector2(part.Width + 0.04f * scale, height + 0.04f * scale);
                     pickers.Add(collider, i);
                 }
                 bodyColors.Add(primary);
@@ -227,22 +285,22 @@ namespace PinkDream
                 if (i == 3 || i == 5)
                 {
                     Vector2 end = new Vector2(0, -part.Length * 0.5f);
-                    Disc(view, "Hand outline", end, 0.36f, Ink, order + 3);
-                    Disc(view, "Hand", end, 0.31f, Skin, order + 4);
+                    Disc(view, "Hand outline", end, 0.36f * scale, Ink, order + 3);
+                    Disc(view, "Hand", end, 0.31f * scale, Skin, order + 4);
                     var hand = view.gameObject.AddComponent<CircleCollider2D>();
                     hand.offset = end;
-                    hand.radius = 0.18f;
+                    hand.radius = 0.18f * scale;
                     pickers.Add(hand, i);
                 }
                 if (i == 7 || i == 9)
                 {
-                    Vector2 end = new Vector2(i == 7 ? -0.1f : 0.1f, -part.Length * 0.5f);
-                    Shape(view, "Foot outline", circle, end, new Vector2(0.55f, 0.30f), Ink, order + 3);
-                    Shape(view, "Foot", circle, end, new Vector2(0.50f, 0.25f), Lilac, order + 4);
+                    Vector2 end = new Vector2((i == 7 ? -0.1f : 0.1f) * scale, -part.Length * 0.5f);
+                    Shape(view, "Foot outline", circle, end, new Vector2(0.55f, 0.30f) * scale, Ink, order + 3);
+                    Shape(view, "Foot", circle, end, new Vector2(0.50f, 0.25f) * scale, Lilac, order + 4);
                     var foot = view.gameObject.AddComponent<CapsuleCollider2D>();
                     foot.direction = CapsuleDirection2D.Horizontal;
                     foot.offset = end;
-                    foot.size = new Vector2(0.56f, 0.31f);
+                    foot.size = new Vector2(0.56f, 0.31f) * scale;
                     pickers.Add(foot, i);
                 }
             }
@@ -251,8 +309,8 @@ namespace PinkDream
             {
                 if (joint.B == 1)
                     continue;
-                Disc(partViews[joint.B], "Joint outline", joint.AnchorB, 0.18f, Ink, 115);
-                Disc(partViews[joint.B], "Joint pin", joint.AnchorB, 0.10f, new Color32(255, 242, 227, 255), 116);
+                Disc(partViews[joint.B], "Joint outline", joint.AnchorB, 0.18f * scale, Ink, 115);
+                Disc(partViews[joint.B], "Joint pin", joint.AnchorB, 0.10f * scale, new Color32(255, 242, 227, 255), 116);
             }
             RefreshPose();
             UnityEditor.EditorUtility.SetDirty(this);
@@ -267,10 +325,10 @@ namespace PinkDream
             if (hoverPart == part)
                 return;
             if (hoverPart >= 0)
-                TintPart(hoverPart, PartColor(hoverPart));
+                TintPart(hoverPart, initialPartColors.Count > hoverPart ? initialPartColors[hoverPart] : PartColor(hoverPart));
             hoverPart = part;
             if (hoverPart >= 0)
-                TintPart(hoverPart, Color.Lerp(PartColor(hoverPart), Color.white, 0.32f));
+                TintPart(hoverPart, Color.Lerp(initialPartColors.Count > hoverPart ? initialPartColors[hoverPart] : PartColor(hoverPart), Color.white, 0.32f));
         }
 
         private void TintPart(int index, Color color)
@@ -340,7 +398,7 @@ namespace PinkDream
 
         private void OnGUI()
         {
-            if (Model == null || uiFont == null)
+            if (!showPrototypeOverlay || Model == null || uiFont == null)
                 return;
             float scale = Mathf.Clamp(Mathf.Min(Screen.width / 1100f, Screen.height / 740f), 0.55f, 1.8f);
             Matrix4x4 previous = GUI.matrix;

@@ -1,4 +1,5 @@
 {
     "name": "PinkDream.Runtime",
-    "rootNamespace": "PinkDream"
+    "rootNamespace": "PinkDream",
+    "references": ["UnityEngine.UI"]
 }

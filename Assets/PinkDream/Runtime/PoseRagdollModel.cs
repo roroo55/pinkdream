@@ -71,6 +71,7 @@ namespace PinkDream
         private Vector2 grabLocal;
         private Vector2 lastPointer;
         private Vector2 target;
+        private readonly float restScale;
 
         public IReadOnlyList<Part> Parts => parts;
         public IReadOnlyList<Joint> Joints => joints;
@@ -78,20 +79,36 @@ namespace PinkDream
         public int GrabbedPart => grabbedPart;
         public Vector2 GrabWorld => IsDragging ? parts[grabbedPart].WorldPoint(grabLocal) : target;
 
-        public PoseRagdollModel(Vector2 origin = default)
+        public PoseRagdollModel(Vector2 origin = default, float bodyScale = 1, float headScale = 1, bool seated = false)
         {
-            parts.Add(new Part("Torso", origin + new Vector2(0, 0.25f), 0, 1.6f, 1.04f, 4f));
-            parts.Add(new Part("Head", origin + new Vector2(0, 1.85f), 0, 1.04f, 1.04f, 1.2f, true));
-            joints.Add(new Joint(0, 1, new Vector2(0, 0.8f), new Vector2(0, -0.8f)));
+            float s = restScale = Mathf.Max(0.1f, bodyScale);
+            float faceScale = s * Mathf.Max(0.5f, headScale);
+            float headAnchor = (0.8f + 0.52f * (Mathf.Max(0.5f, headScale) - 1)) * s;
+            Vector2 torsoPosition = origin + new Vector2(0, 0.25f * s);
+            parts.Add(new Part("Torso", torsoPosition, 0, 1.6f * s, 1.04f * s, 4f));
+            parts.Add(new Part("Head", torsoPosition + new Vector2(0, 0.8f * s + headAnchor),
+                0, 1.04f * faceScale, 1.04f * faceScale, 1.2f, true));
+            joints.Add(new Joint(0, 1, new Vector2(0, 0.8f * s), new Vector2(0, -headAnchor)));
 
-            AddLimb("Left upper arm", "Left forearm", new Vector2(-0.48f, 0.60f),
-                origin + new Vector2(-1.03f, 0.03f), origin + new Vector2(-1.23f, -0.91f), 0.27f, 0.23f, 0.65f);
-            AddLimb("Right upper arm", "Right forearm", new Vector2(0.48f, 0.60f),
-                origin + new Vector2(1.03f, 0.03f), origin + new Vector2(1.23f, -0.91f), 0.27f, 0.23f, 0.65f);
-            AddLimb("Left thigh", "Left shin", new Vector2(-0.30f, -0.68f),
-                origin + new Vector2(-0.43f, -1.57f), origin + new Vector2(-0.52f, -2.68f), 0.34f, 0.28f, 1f);
-            AddLimb("Right thigh", "Right shin", new Vector2(0.30f, -0.68f),
-                origin + new Vector2(0.43f, -1.57f), origin + new Vector2(0.52f, -2.68f), 0.34f, 0.28f, 1f);
+            AddLimb("Left upper arm", "Left forearm", new Vector2(-0.48f, 0.60f) * s,
+                origin + new Vector2(-1.03f, 0.03f) * s, origin + new Vector2(-1.23f, -0.91f) * s, 0.27f * s, 0.23f * s, 0.65f);
+            AddLimb("Right upper arm", "Right forearm", new Vector2(0.48f, 0.60f) * s,
+                origin + new Vector2(1.03f, 0.03f) * s, origin + new Vector2(1.23f, -0.91f) * s, 0.27f * s, 0.23f * s, 0.65f);
+            for (int side = -1; side <= 1; side += 2)
+            {
+                Vector2 knee = origin + new Vector2(side * 0.43f, -1.57f) * s;
+                Vector2 foot = origin + new Vector2(side * 0.52f, -2.68f) * s;
+                if (seated)
+                {
+                    Vector2 hip = torsoPosition + new Vector2(side * 0.30f, -0.68f) * s;
+                    float thighLength = new Vector2(0.13f, 1.14f).magnitude * s;
+                    float shinLength = new Vector2(0.09f, 1.11f).magnitude * s;
+                    knee = hip + new Vector2(side * 0.8f, -0.6f) * thighLength;
+                    foot = knee + new Vector2(side * 0.98f, -Mathf.Sqrt(1 - 0.98f * 0.98f)) * shinLength;
+                }
+                AddLimb(side < 0 ? "Left thigh" : "Right thigh", side < 0 ? "Left shin" : "Right shin",
+                    new Vector2(side * 0.30f, -0.68f) * s, knee, foot, 0.34f * s, 0.28f * s, 1f);
+            }
         }
 
         private void AddLimb(string upperName, string lowerName, Vector2 torsoAnchor,
@@ -118,6 +135,7 @@ namespace PinkDream
         {
             if (partIndex < 0 || partIndex >= parts.Count)
                 throw new ArgumentOutOfRangeException(nameof(partIndex));
+            AlignHeadWithTorso();
             grabbedPart = partIndex;
             grabLocal = parts[partIndex].LocalPoint(pointer);
             target = lastPointer = pointer;
@@ -131,7 +149,7 @@ namespace PinkDream
             // Small spatial steps handle fast mouse motion without tearing joints.
             // This is distance-based, never frame-rate- or time-based.
             Vector2 start = lastPointer;
-            int steps = Mathf.Clamp(Mathf.CeilToInt(Vector2.Distance(start, pointer) / 0.09f), 1, 96);
+            int steps = Mathf.Clamp(Mathf.CeilToInt(Vector2.Distance(start, pointer) / (0.09f * restScale)), 1, 96);
             for (int step = 1; step <= steps; step++)
             {
                 target = Vector2.Lerp(start, pointer, step / (float)steps);
@@ -152,6 +170,7 @@ namespace PinkDream
             Vector2 correction = pointer - GrabWorld;
             foreach (Part part in parts)
                 part.Position += correction;
+            AlignHeadWithTorso();
             lastPointer = pointer;
             return true;
         }
@@ -163,12 +182,30 @@ namespace PinkDream
 
         private void PinGrab()
         {
+            AlignHeadWithTorso();
             Part part = parts[grabbedPart];
-            part.Position += target - part.WorldPoint(grabLocal);
+            // The head is carried by the torso, not an independent hinge. A
+            // head grab therefore moves their shared frame while preserving
+            // the exact clicked point, just like grabbing the torso itself.
+            Part moved = grabbedPart == 1 ? parts[0] : part;
+            moved.Position += target - part.WorldPoint(grabLocal);
+            AlignHeadWithTorso();
+        }
+
+        public void AlignHeadWithTorso()
+        {
+            Joint neck = joints[0];
+            Part torso = parts[neck.A], head = parts[neck.B];
+            head.Angle = torso.Angle;
+            head.Position = torso.Position + torso.Rotate(neck.AnchorA - neck.AnchorB);
         }
 
         private void SolveJoint(Joint joint)
         {
+            // Keep the neck record and anchors, but do not solve it as a free
+            // hinge: the head's pose is derived exactly from the torso above.
+            if (joint.A == 0 && joint.B == 1)
+                return;
             Part a = parts[joint.A], b = parts[joint.B];
             Vector2 ra = a.Rotate(joint.AnchorA), rb = b.Rotate(joint.AnchorB);
             Vector2 error = b.Position + rb - a.Position - ra;
