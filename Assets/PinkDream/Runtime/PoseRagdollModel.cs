@@ -79,9 +79,18 @@ namespace PinkDream
         public int GrabbedPart => grabbedPart;
         public Vector2 GrabWorld => IsDragging ? parts[grabbedPart].WorldPoint(grabLocal) : target;
 
-        public PoseRagdollModel(Vector2 origin = default, float bodyScale = 1, float headScale = 1, bool seated = false)
+        public PoseRagdollModel(Vector2 origin = default, float bodyScale = 1, float headScale = 1, bool seated = false, RagdollArtProfile artProfile = null)
         {
             float s = restScale = Mathf.Max(0.1f, bodyScale);
+            if (artProfile != null)
+            {
+                foreach (RagdollArtProfile.BodyPart part in artProfile.parts)
+                    parts.Add(new Part(part.name, origin + part.position * s, part.angleDegrees * Mathf.Deg2Rad,
+                        part.length * s, part.width * s, part.mass, part.isCircle));
+                foreach (RagdollArtProfile.Connection joint in artProfile.joints)
+                    joints.Add(new Joint(joint.parent, joint.child, joint.parentAnchor * s, joint.childAnchor * s));
+                return;
+            }
             float faceScale = s * Mathf.Max(0.5f, headScale);
             float headAnchor = (0.8f + 0.52f * (Mathf.Max(0.5f, headScale) - 1)) * s;
             Vector2 torsoPosition = origin + new Vector2(0, 0.25f * s);

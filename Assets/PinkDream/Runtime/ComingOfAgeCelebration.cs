@@ -129,6 +129,9 @@ namespace PinkDream
         private bool IsBlankPoint(Vector2 screen)
         {
             Vector2 world = girl.ScreenToWorld(screen);
+            var overlaps = girl.GetComponent<RagdollJointOverlap>();
+            if (overlaps != null && overlaps.ContainsWorldPoint(world))
+                return false;
             foreach (SpriteRenderer sprite in FindObjectsOfType<SpriteRenderer>())
                 if (sprite.enabled && sprite.sortingOrder >= 0 && sprite.color.a > 0.05f && Contains(sprite.bounds, world) && HitsSprite(sprite, world))
                     return false;

@@ -12070,6 +12070,7 @@ MonoBehaviour:
   bodyScale: 1
   headScale: 1
   seatedRestPose: 0
+  artProfile: {fileID: 0}
 --- !u!4 &1229003491
 Transform:
   m_ObjectHideFlags: 0
@@ -18825,6 +18826,7 @@ MonoBehaviour:
   bodyScale: 1
   headScale: 1
   seatedRestPose: 0
+  artProfile: {fileID: 0}
 --- !u!4 &1960847195
 Transform:
   m_ObjectHideFlags: 0

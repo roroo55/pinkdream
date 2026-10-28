@@ -19,6 +19,8 @@ namespace PinkDream
         [SerializeField, Min(0.1f)] private float bodyScale = 1;
         [SerializeField, Min(0.5f)] private float headScale = 1;
         [SerializeField] private bool seatedRestPose;
+        [Header("原画身体尺寸与关节（几何角色留空）")]
+        [SerializeField] private RagdollArtProfile artProfile;
         private readonly List<Color> initialPartColors = new List<Color>();
 #if UNITY_EDITOR
         private Sprite circle, square;
@@ -26,6 +28,7 @@ namespace PinkDream
 #endif
         private Font uiFont;
         private int hoverPart = -1;
+        private RagdollJointOverlap jointOverlaps;
         private static readonly Color Ink = new Color32(91, 54, 73, 255);
         private static readonly Color Skin = new Color32(255, 219, 196, 255);
         private static readonly Color Rose = new Color32(215, 129, 161, 255);
@@ -53,6 +56,7 @@ namespace PinkDream
             }
             uiFont = Font.CreateDynamicFontFromOSFont(new[] { "Microsoft YaHei", "SimHei", "Arial" }, 20);
             ownedAssets.Add(uiFont);
+            jointOverlaps = GetComponent<RagdollJointOverlap>();
             RefreshPose();
         }
 
@@ -82,7 +86,7 @@ namespace PinkDream
         }
 
         private PoseRagdollModel CreateModel()
-            => new PoseRagdollModel(transform.position, bodyScale, headScale, seatedRestPose);
+            => new PoseRagdollModel(transform.position, bodyScale, headScale, seatedRestPose, artProfile);
 
         private void Update()
         {
@@ -132,7 +136,7 @@ namespace PinkDream
             int selected = -1, frontOrder = -1;
             foreach (KeyValuePair<Collider2D, int> item in pickers)
             {
-                int order = item.Value == 1 ? 110 : item.Value * 10;
+                int order = artProfile != null ? bodyColors[item.Value].sortingOrder : item.Value == 1 ? 110 : item.Value * 10;
                 if (item.Key.OverlapPoint(world) && order > frontOrder)
                 {
                     selected = item.Value;
@@ -151,6 +155,7 @@ namespace PinkDream
                     Quaternion.Euler(0, 0, part.Angle * Mathf.Rad2Deg));
             }
             Physics2D.SyncTransforms();
+            jointOverlaps?.RefreshVisuals();
         }
 
         // Level interactions use the same grab point and pose solver as the
@@ -220,7 +225,7 @@ namespace PinkDream
         {
             if (Application.isPlaying)
                 throw new System.InvalidOperationException("Bake character geometry in Edit mode only.");
-            if (transform.Find("Geometric ragdoll") != null)
+            if (visualRoot != null || transform.Find("Geometric ragdoll") != null)
                 throw new System.InvalidOperationException("The scene already contains the character geometry.");
             Model = CreateModel();
             partViews.Clear();
