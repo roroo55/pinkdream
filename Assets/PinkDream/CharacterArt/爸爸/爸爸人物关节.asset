@@ -1,0 +1,100 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbf1a5a188cc480fa8aab4b65cf5ee63, type: 3}
+  m_Name: "\u7238\u7238\u4EBA\u7269\u5173\u8282"
+  m_EditorClassIdentifier: 
+  parts:
+  - name: Torso
+    position: {x: 0, y: 0.25000006}
+    angleDegrees: 0
+    length: 1.1975404
+    width: 0.9708216
+    mass: 4
+    isCircle: 0
+  - name: Head
+    position: {x: -0.0029066515, y: 1.4489938}
+    angleDegrees: 0
+    length: 1.4387926
+    width: 1.1801006
+    mass: 1.2
+    isCircle: 1
+  - name: Left upper arm
+    position: {x: -0.70849633, y: 0.55083853}
+    angleDegrees: -79.30893
+    length: 0.50138056
+    width: 0.45925096
+    mass: 0.65
+    isCircle: 0
+  - name: Left forearm
+    position: {x: -1.2462269, y: 0.50142545}
+    angleDegrees: -89.42849
+    length: 0.58281267
+    width: 0.26159865
+    mass: 0.52
+    isCircle: 0
+  - name: Right upper arm
+    position: {x: 0.713583, y: 0.48434886}
+    angleDegrees: 84.48089
+    length: 0.4759908
+    width: 0.4563443
+    mass: 0.65
+    isCircle: 0
+  - name: Right forearm
+    position: {x: 1.2447735, y: 0.47998887}
+    angleDegrees: -266.39725
+    length: 0.58976245
+    width: 0.2703186
+    mass: 0.52
+    isCircle: 0
+  - name: Left leg
+    position: {x: -0.39603126, y: -1.9779484}
+    angleDegrees: -8.398821
+    length: 2.0596519
+    width: 0.79642254
+    mass: 1.8
+    isCircle: 0
+  - name: Right leg
+    position: {x: 0.39094463, y: -1.9735885}
+    angleDegrees: 8.3237095
+    length: 2.0680678
+    width: 0.80223584
+    mass: 1.8
+    isCircle: 0
+  joints:
+  - parent: 0
+    child: 1
+    parentAnchor: {x: 0, y: 0.575517}
+    childAnchor: {x: 0.0029066515, y: -0.62347674}
+  - parent: 0
+    child: 2
+    parentAnchor: {x: -0.4621576, y: 0.34734488}
+    childAnchor: {x: 0.000000036595942, y: 0.25069028}
+  - parent: 2
+    child: 3
+    parentAnchor: {x: 0.000000021974065, y: -0.25069028}
+    childAnchor: {x: 0.000000049389627, y: 0.29140633}
+  - parent: 0
+    child: 4
+    parentAnchor: {x: 0.47669086, y: 0.2572387}
+    childAnchor: {x: 0.000000013352497, y: 0.23799545}
+  - parent: 4
+    child: 5
+    parentAnchor: {x: -0.000000016218817, y: -0.23799542}
+    childAnchor: {x: 0.000000028689083, y: 0.29488117}
+  - parent: 0
+    child: 6
+    parentAnchor: {x: -0.24561206, y: -1.209167}
+    childAnchor: {x: 0, y: 1.0298259}
+  - parent: 0
+    child: 7
+    parentAnchor: {x: 0.24125208, y: -1.2004471}
+    childAnchor: {x: 0, y: 1.0340339}
