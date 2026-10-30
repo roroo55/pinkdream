@@ -27,7 +27,7 @@ namespace PinkDream.Editor
             circle = LoadSprite("Assets/PinkDream/Geometry/Circle.asset");
             square = LoadSprite("Assets/PinkDream/Geometry/Square.asset");
             material = AssetDatabase.LoadAssetAtPath<Material>("Assets/PinkDream/Geometry/RagdollGeometry.mat");
-            font = AssetDatabase.LoadAssetAtPath<Font>("Assets/PinkDream/Geometry/SceneUIFont.ttf");
+            font = AssetDatabase.LoadAssetAtPath<Font>("Assets/art/Date Night.ttf");
             if (File.Exists(OldPath))
             {
                 string error = AssetDatabase.MoveAsset(OldPath, LevelPath);
@@ -219,7 +219,7 @@ namespace PinkDream.Editor
         private static BabyBirthdayLevel.GraspItem Record(Transform root, string name, Vector2 grip)
         {
             var collider = BabyBirthdayItemColliders.Fit(root, name);
-            return new BabyBirthdayLevel.GraspItem { itemName = name, root = root, collider = collider, gripPoint = Group("抓握位置", root, grip) };
+            return new BabyBirthdayLevel.GraspItem { itemName = EnglishTypographyAuthoring.Translate(name), root = root, collider = collider, gripPoint = Group("抓握位置", root, grip) };
         }
         private static void Ring(Transform parent, Vector2 position, float size, Color color)
         {
@@ -310,7 +310,7 @@ namespace PinkDream.Editor
             var go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
             go.transform.SetParent(parent, false);
             var label = go.GetComponent<Text>();
-            label.text = text;
+            label.text = EnglishTypographyAuthoring.Translate(text);
             label.font = font;
             label.fontSize = size;
             label.color = Ink;

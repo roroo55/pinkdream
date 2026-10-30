@@ -28,7 +28,7 @@ namespace PinkDream.Editor
             circle = LoadSprite("Assets/PinkDream/Geometry/Circle.asset");
             square = LoadSprite("Assets/PinkDream/Geometry/Square.asset");
             material = AssetDatabase.LoadAssetAtPath<Material>("Assets/PinkDream/Geometry/RagdollGeometry.mat");
-            font = AssetDatabase.LoadAssetAtPath<Font>("Assets/PinkDream/Geometry/SceneUIFont.ttf");
+            font = AssetDatabase.LoadAssetAtPath<Font>("Assets/art/Date Night.ttf");
             string error = AssetDatabase.MoveAsset(OldPath, LevelPath);
             if (!string.IsNullOrEmpty(error))
                 throw new System.InvalidOperationException(error);
@@ -228,7 +228,7 @@ namespace PinkDream.Editor
             collider.pathCount = paths.Count;
             for (int i = 0; i < paths.Count; i++)
                 collider.SetPath(i, paths[i]);
-            return new ChildhoodPackingLevel.PackingItem { itemName = name, root = root, collider = collider };
+            return new ChildhoodPackingLevel.PackingItem { itemName = EnglishTypographyAuthoring.Translate(name), root = root, collider = collider };
         }
 
         private static void Solid(Transform parent, string name, Sprite sprite, Vector2 position, Vector2 size,
@@ -313,7 +313,7 @@ namespace PinkDream.Editor
             go.transform.SetParent(parent, false);
             var label = go.GetComponent<Text>();
             label.font = font;
-            label.text = text;
+            label.text = EnglishTypographyAuthoring.Translate(text);
             label.fontSize = size;
             label.color = Ink;
             label.alignment = TextAnchor.MiddleCenter;

@@ -154,7 +154,7 @@ namespace PinkDream
                         sprite.sortingOrder = 330 + sprite.sortingOrder % 10;
                     foreach (Canvas label in choices[i].item.GetComponentsInChildren<Canvas>())
                         label.enabled = false;
-                    feedbackText.text = "拿到了" + choices[i].itemName + "，把手带到蛋糕旁。";
+                    feedbackText.text = "Picked up " + choices[i].itemName + "   Bring it to the cake";
                     break;
                 }
             }
@@ -180,7 +180,7 @@ namespace PinkDream
                 choice.decoration.localScale = decorationScales[index] * 0.01f;
                 choice.decoration.gameObject.SetActive(true);
                 UpdateCombination();
-                feedbackText.text = "还可以继续组合。装扮好了，就拉下右边的拉绳。";
+                feedbackText.text = "Add more or pull the cord on the right when you are ready";
             }
         }
 
@@ -200,7 +200,7 @@ namespace PinkDream
             }
         }
 
-        private void UpdateCombination() => combinationText.text = "已组合 " + decoratedCount + " 种装饰 · 可以继续，也可以随时完成";
+        private void UpdateCombination() => combinationText.text = "Decorations " + EnglishText.Number(decoratedCount) + "   Add more or finish when ready";
 
         private void FinishDecorating()
         {

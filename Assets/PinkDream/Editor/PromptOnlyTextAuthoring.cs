@@ -50,7 +50,7 @@ namespace PinkDream.Editor
                 {
                     var data = new SerializedObject(start);
                     var instruction = (Text)data.FindProperty("instructionText").objectReferenceValue;
-                    instruction.text = "把放大镜拖到 B 超屏幕，找到 START 后停留至少 1 秒。";
+                    instruction.text = EnglishTypographyAuthoring.Translate("把放大镜拖到 B 超屏幕，找到 START 后停留至少 1 秒。");
                     EditorUtility.SetDirty(instruction);
                 }
                 EditorSceneManager.MarkSceneDirty(scene);
@@ -61,6 +61,6 @@ namespace PinkDream.Editor
         }
 
         private static bool IsPrompt(Text text) => PromptNames.Contains(text.name) || text.text == "START" ||
-            text.text == "把物品放在这里\n松手收好" || text.text == "向下拉\n装扮完毕";
+            EnglishTypographyAuthoring.Translate(text.text) == "DROP HERE\nRELEASE" || EnglishTypographyAuthoring.Translate(text.text) == "PULL DOWN\nTO FINISH";
     }
 }

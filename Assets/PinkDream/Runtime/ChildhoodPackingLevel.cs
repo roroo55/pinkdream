@@ -107,7 +107,7 @@ namespace PinkDream
                     SetItemOrder(items[i], 300);
                     foreach (Canvas label in items[i].root.GetComponentsInChildren<Canvas>())
                         label.enabled = false;
-                    feedbackText.text = "拿到了" + items[i].itemName + "，放进书包后松手。";
+                    feedbackText.text = "Picked up " + items[i].itemName + "   Put it in the bag then release";
                     break;
                 }
             }
@@ -142,17 +142,17 @@ namespace PinkDream
                 heldItems[hand] = -1;
                 packed[index] = true;
                 packedCount++;
-                feedbackText.text = item.itemName + "装好了，继续整理吧。";
+                feedbackText.text = item.itemName + " packed   Keep going";
                 UpdateProgress();
             }
             if (packedCount != items.Length)
                 return;
             IsComplete = true;
-            feedbackText.text = "已全部收好，即将进入下一关。";
+            feedbackText.text = "All packed Moving to the next stage";
             StartCoroutine(ContinueToNextLevel());
         }
 
-        private void UpdateProgress() => progressText.text = "整理书包  " + packedCount + " / " + items.Length;
+        private void UpdateProgress() => progressText.text = "Packed " + EnglishText.Number(packedCount) + " of " + EnglishText.Number(items.Length);
 
         private static void SetItemOrder(PackingItem item, int order)
         {

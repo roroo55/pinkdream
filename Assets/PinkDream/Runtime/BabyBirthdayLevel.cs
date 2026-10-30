@@ -128,7 +128,7 @@ namespace PinkDream
             // Keep the actual contact pose instead of snapping to a grip point.
             selected.root.SetParent(hand == 3 ? leftHandAnchor : rightHandAnchor, true);
             Physics2D.SyncTransforms();
-            feedbackText.text = "已抓到物品，即将进入下一关。";
+            feedbackText.text = "Item caught Moving to the next stage";
             // Only a local display name is used. No preference, career or item
             // flag is persisted; every item advances through the same route.
             StartCoroutine(ContinueToNextLevel());

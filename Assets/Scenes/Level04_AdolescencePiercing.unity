@@ -6040,19 +6040,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: b5b8f51123af484bb126e840b218a606, type: 3}
+    m_Font: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
     m_FontSize: 34
     m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
+    m_BestFit: 1
+    m_MinSize: 16
+    m_MaxSize: 34
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u62FF\u8D77\u7A7F\u8033\u5668\uFF0C\u5B8C\u6210\u4E24\u4FA7\u8033\u6D1E"
+  m_Text: Pick up the tool and pierce both ears
 --- !u!222 &1064595681
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7883,20 +7883,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: b5b8f51123af484bb126e840b218a606, type: 3}
+    m_Font: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
     m_FontSize: 23
     m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
+    m_BestFit: 1
+    m_MinSize: 16
+    m_MaxSize: 23
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u62D6\u52A8\u5973\u5B69\u7684\u624B\u62FF\u8D77\u7A7F\u8033\u5668\uFF0C\u5B8C\u6210\u4E24\u4FA7\u8033\u6D1E\uFF080
-    / 2\uFF09\u3002"
+  m_Text: Use her hand to pick up the piercing tool Ears zero of two
 --- !u!222 &1679153740
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9596,6 +9595,7 @@ MonoBehaviour:
   headScale: 1.05
   seatedRestPose: 0
   artProfile: {fileID: 11400000, guid: a1da43733fdfc1c4ab9a135953c612ab, type: 2}
+  uiFont: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
 --- !u!114 &2108817658
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -41,7 +41,7 @@ namespace PinkDream
             palms[0] = leftHandAnchor.parent.GetComponent<CircleCollider2D>();
             palms[1] = rightHandAnchor.parent.GetComponent<CircleCollider2D>();
             pierced = new bool[ears.Length];
-            feedbackText.text = "拖动女孩的手拿起穿耳器，完成两侧耳洞（0 / 2）。";
+            feedbackText.text = "Use her hand to pick up the piercing tool Ears zero of two";
         }
 
         private void Update()
@@ -103,7 +103,7 @@ namespace PinkDream
                     renderer.sortingOrder = 340 + renderer.sortingOrder % 10;
                 foreach (Canvas label in piercingTool.GetComponentsInChildren<Canvas>())
                     label.enabled = false;
-                feedbackText.text = "让穿耳器的银色前端碰到耳垂，再松手。两侧都要完成（0 / 2）。";
+                feedbackText.text = "Touch an earlobe with the silver tip then release Ears zero of two";
                 return;
             }
         }
@@ -129,11 +129,11 @@ namespace PinkDream
                 ear.earring.SetActive(true);
                 if (piercedCount < ears.Length)
                 {
-                    feedbackText.text = "已完成一侧耳洞（1 / 2），继续完成另一侧。";
+                    feedbackText.text = "One ear done Pierce the other ear Ears one of two";
                     return;
                 }
                 IsComplete = true;
-                feedbackText.text = "两侧耳洞已完成（2 / 2），即将进入下一关。";
+                feedbackText.text = "Both ears done Moving to the next stage";
                 StartCoroutine(ContinueToNextLevel());
                 return;
             }

@@ -4031,6 +4031,7 @@ MonoBehaviour:
   headScale: 1
   seatedRestPose: 0
   artProfile: {fileID: 11400000, guid: 2eaa918bcecdb464b9e41201d2820f91, type: 2}
+  uiFont: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
 --- !u!114 &394365436
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5642,19 +5643,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: b5b8f51123af484bb126e840b218a606, type: 3}
+    m_Font: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
     m_FontSize: 22
     m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
+    m_BestFit: 1
+    m_MinSize: 16
+    m_MaxSize: 22
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u62D6\u52A8\u5973\u5B69\u7684\u624B\u78B0\u5230\u7269\u54C1\uFF0C\u62FF\u8D77\u540E\u628A\u624B\u5E26\u5230\u86CB\u7CD5\u65C1\u3002"
+  m_Text: Pick up an item with her hand then move it to the cake
 --- !u!1 &634662360
 GameObject:
   m_ObjectHideFlags: 0
@@ -11806,19 +11807,21 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: b5b8f51123af484bb126e840b218a606, type: 3}
+    m_Font: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
     m_FontSize: 23
     m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
+    m_BestFit: 1
+    m_MinSize: 16
+    m_MaxSize: 23
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u5411\u4E0B\u62C9\n\u88C5\u626E\u5B8C\u6BD5"
+  m_Text: 'PULL DOWN
+
+    TO FINISH'
 --- !u!222 &755662909
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -12340,19 +12343,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: b5b8f51123af484bb126e840b218a606, type: 3}
+    m_Font: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
     m_FontSize: 32
     m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
+    m_BestFit: 1
+    m_MinSize: 16
+    m_MaxSize: 32
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u62FF\u8D77\u559C\u6B22\u7684\u7269\u54C1\uFF0C\u628A\u5B83\u53D8\u6210\u86CB\u7CD5\u4E0A\u7684\u88C5\u9970"
+  m_Text: Turn the things you love into cake decorations
 --- !u!222 &790925733
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -21458,31 +21461,31 @@ MonoBehaviour:
   rightHandAnchor: {fileID: 2088101032}
   looseItems: {fileID: 695752585}
   choices:
-  - itemName: "\u753B\u7B14"
+  - itemName: Paintbrush
     item: {fileID: 634662362}
     collider: {fileID: 634662361}
     decoration: {fileID: 1294375293}
     motion: 0
     sparkle: {fileID: 0}
-  - itemName: "\u79CD\u5B50"
+  - itemName: Seed
     item: {fileID: 867627163}
     collider: {fileID: 867627162}
     decoration: {fileID: 1426999866}
     motion: 1
     sparkle: {fileID: 0}
-  - itemName: "\u661F\u661F"
+  - itemName: Star
     item: {fileID: 1534881468}
     collider: {fileID: 1534881467}
     decoration: {fileID: 2130308998}
     motion: 2
     sparkle: {fileID: 0}
-  - itemName: "\u8774\u8776\u7ED3"
+  - itemName: Ribbon
     item: {fileID: 976085778}
     collider: {fileID: 976085777}
     decoration: {fileID: 246441735}
     motion: 0
     sparkle: {fileID: 0}
-  - itemName: "\u76F8\u673A"
+  - itemName: Camera
     item: {fileID: 1154068306}
     collider: {fileID: 1154068305}
     decoration: {fileID: 332302645}
@@ -23626,19 +23629,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: b5b8f51123af484bb126e840b218a606, type: 3}
+    m_Font: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
     m_FontSize: 22
     m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
+    m_BestFit: 1
+    m_MinSize: 16
+    m_MaxSize: 22
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u5DF2\u7EC4\u5408 0 \u79CD\u88C5\u9970 \xB7 \u53EF\u4EE5\u7EE7\u7EED\uFF0C\u4E5F\u53EF\u4EE5\u968F\u65F6\u5B8C\u6210"
+  m_Text: Decorations zero keep creating or finish whenever you like
 --- !u!1 &1565388090
 GameObject:
   m_ObjectHideFlags: 0

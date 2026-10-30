@@ -36,7 +36,7 @@ namespace PinkDream.Editor
             circle = LoadSprite("Assets/PinkDream/Geometry/Circle.asset");
             square = LoadSprite("Assets/PinkDream/Geometry/Square.asset");
             material = AssetDatabase.LoadAssetAtPath<Material>("Assets/PinkDream/Geometry/RagdollGeometry.mat");
-            font = AssetDatabase.LoadAssetAtPath<Font>("Assets/PinkDream/Geometry/SceneUIFont.ttf");
+            font = AssetDatabase.LoadAssetAtPath<Font>("Assets/art/Date Night.ttf");
             star = LoadOrCreateStar();
             string error = AssetDatabase.MoveAsset(OldPath, LevelPath);
             if (!string.IsNullOrEmpty(error))
@@ -334,7 +334,7 @@ namespace PinkDream.Editor
             collider.pathCount = paths.Count;
             for (int i = 0; i < paths.Count; i++)
                 collider.SetPath(i, paths[i]);
-            return new ComingOfAgeLevel.Choice { itemName = name, item = root, collider = collider, decoration = decoration, motion = motion };
+            return new ComingOfAgeLevel.Choice { itemName = EnglishTypographyAuthoring.Translate(name), item = root, collider = collider, decoration = decoration, motion = motion };
         }
 
         private static void Bow(Transform root, float size, int order, List<Vector2[]> paths)
@@ -525,7 +525,7 @@ namespace PinkDream.Editor
             go.transform.SetParent(parent, false);
             var label = go.GetComponent<Text>();
             label.font = font;
-            label.text = text;
+            label.text = EnglishTypographyAuthoring.Translate(text);
             label.fontSize = size;
             label.color = Ink;
             label.alignment = TextAnchor.MiddleCenter;

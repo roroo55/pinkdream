@@ -26,7 +26,7 @@ namespace PinkDream
         private Sprite circle, square;
         private Material material;
 #endif
-        private Font uiFont;
+        [SerializeField] private Font uiFont;
         private int hoverPart = -1;
         private RagdollJointOverlap jointOverlaps;
         private static readonly Color Ink = new Color32(91, 54, 73, 255);
@@ -54,8 +54,6 @@ namespace PinkDream
                 enabled = false;
                 return;
             }
-            uiFont = Font.CreateDynamicFontFromOSFont(new[] { "Microsoft YaHei", "SimHei", "Arial" }, 20);
-            ownedAssets.Add(uiFont);
             jointOverlaps = GetComponent<RagdollJointOverlap>();
             RefreshPose();
         }
@@ -227,6 +225,7 @@ namespace PinkDream
                 throw new System.InvalidOperationException("Bake character geometry in Edit mode only.");
             if (visualRoot != null || transform.Find("Geometric ragdoll") != null)
                 throw new System.InvalidOperationException("The scene already contains the character geometry.");
+            uiFont = UnityEditor.AssetDatabase.LoadAssetAtPath<Font>("Assets/art/Date Night.ttf");
             Model = CreateModel();
             partViews.Clear();
             bodyColors.Clear();
@@ -412,13 +411,13 @@ namespace PinkDream
             var small = new GUIStyle(GUI.skin.label) { font = uiFont, fontSize = 14, normal = { textColor = Ink } };
             var title = new GUIStyle(small) { fontSize = 30, fontStyle = FontStyle.Bold };
             var hint = new GUIStyle(small) { fontSize = 17, alignment = TextAnchor.MiddleCenter };
-            GUI.Label(new Rect(36, 25, w - 72, 28), "01  /  RAGDOLL PROTOTYPE", small);
+            GUI.Label(new Rect(36, 25, w - 72, 28), "RAGDOLL PROTOTYPE", small);
             GUI.Label(new Rect(34, 55, w - 68, 50), "Pink Dream", title);
             small.alignment = TextAnchor.UpperRight;
-            GUI.Label(new Rect(w - 290, 32, 250, 30), Model.IsDragging ? "●  DRAGGING" : "●  FROZEN", small);
-            GUI.Label(new Rect(24, h - 83, w - 48, 32), "按住头、身体或四肢拖拽，摆出你想要的姿势", hint);
+            GUI.Label(new Rect(w - 290, 32, 250, 30), Model.IsDragging ? "DRAGGING" : "FROZEN", small);
+            GUI.Label(new Rect(24, h - 83, w - 48, 32), "Drag the head body or limbs to strike a pose", hint);
             hint.fontSize = 14;
-            GUI.Label(new Rect(24, h - 53, w - 48, 30), "鼠标停住就停住 · 松手保持姿势", hint);
+            GUI.Label(new Rect(24, h - 53, w - 48, 30), "Move the mouse to pose Release to hold", hint);
             GUI.matrix = previous;
         }
 

@@ -28,7 +28,7 @@ namespace PinkDream.Editor
             circle = LoadSprite("Assets/PinkDream/Geometry/Circle.asset");
             square = LoadSprite("Assets/PinkDream/Geometry/Square.asset");
             material = AssetDatabase.LoadAssetAtPath<Material>("Assets/PinkDream/Geometry/RagdollGeometry.mat");
-            const string fontPath = "Assets/PinkDream/Geometry/SceneUIFont.ttf";
+            const string fontPath = "Assets/art/Date Night.ttf";
             font = AssetDatabase.LoadAssetAtPath<Font>(fontPath);
             if (font == null)
                 throw new System.InvalidOperationException("Import the scene UI font before creating scenes: " + fontPath);
@@ -298,7 +298,7 @@ namespace PinkDream.Editor
             var go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
             var label = go.GetComponent<Text>();
             label.transform.SetParent(parent, false);
-            label.text = text;
+            label.text = EnglishTypographyAuthoring.Translate(text);
             label.font = font;
             label.fontSize = fontSize;
             label.alignment = TextAnchor.MiddleCenter;

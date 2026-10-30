@@ -2389,19 +2389,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: b5b8f51123af484bb126e840b218a606, type: 3}
+    m_Font: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
     m_FontSize: 33
     m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
+    m_BestFit: 1
+    m_MinSize: 16
+    m_MaxSize: 33
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u6574\u7406\u4E66\u5305\uFF1A\u628A\u7C89\u8272\u7684\u4E1C\u897F\u5168\u90E8\u88C5\u8FDB\u53BB"
+  m_Text: Pack all the pink items in the schoolbag
 --- !u!222 &509275603
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3198,6 +3198,7 @@ MonoBehaviour:
   headScale: 1.3
   seatedRestPose: 0
   artProfile: {fileID: 11400000, guid: a6d52d6e7d82ceb4db1cf219463721a2, type: 2}
+  uiFont: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
 --- !u!114 &651955219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6157,19 +6158,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: b5b8f51123af484bb126e840b218a606, type: 3}
+    m_Font: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
     m_FontSize: 23
     m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
+    m_BestFit: 1
+    m_MinSize: 16
+    m_MaxSize: 23
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u62D6\u52A8\u5973\u5B69\u7684\u624B\u62FF\u8D77\u7269\u54C1\uFF0C\u653E\u8FDB\u4E66\u5305\u91CC\uFF0C\u518D\u677E\u624B\u3002"
+  m_Text: Pick up an item put it in the bag then release
 --- !u!222 &1557347071
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7270,19 +7271,19 @@ MonoBehaviour:
   leftHandAnchor: {fileID: 195262715}
   rightHandAnchor: {fileID: 1518838086}
   items:
-  - itemName: "\u7C89\u8272\u5E03\u5A03\u5A03"
+  - itemName: Pink doll
     root: {fileID: 272155237}
     collider: {fileID: 272155236}
-  - itemName: "\u7C89\u8272\u94C5\u7B14"
+  - itemName: Pink pencil
     root: {fileID: 575970731}
     collider: {fileID: 575970730}
-  - itemName: "\u7C89\u8272\u6A61\u76AE"
+  - itemName: Pink eraser
     root: {fileID: 1420622328}
     collider: {fileID: 1420622327}
-  - itemName: "\u7C89\u8272\u7B14\u8BB0\u672C"
+  - itemName: Pink notebook
     root: {fileID: 1146633521}
     collider: {fileID: 1146633520}
-  - itemName: "\u7C89\u8272\u6545\u4E8B\u4E66"
+  - itemName: Pink storybook
     root: {fileID: 590491015}
     collider: {fileID: 590491014}
   bagInterior: {fileID: 1045998891}
@@ -7372,19 +7373,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: b5b8f51123af484bb126e840b218a606, type: 3}
+    m_Font: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
     m_FontSize: 23
     m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
+    m_BestFit: 1
+    m_MinSize: 16
+    m_MaxSize: 23
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u6574\u7406\u4E66\u5305  0 / 5"
+  m_Text: Packed zero of five
 --- !u!1 &1886300994
 GameObject:
   m_ObjectHideFlags: 0
@@ -7817,19 +7818,21 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: b5b8f51123af484bb126e840b218a606, type: 3}
+    m_Font: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
     m_FontSize: 22
     m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
+    m_BestFit: 1
+    m_MinSize: 16
+    m_MaxSize: 22
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u628A\u7269\u54C1\u653E\u5728\u8FD9\u91CC\n\u677E\u624B\u6536\u597D"
+  m_Text: 'DROP HERE
+
+    RELEASE'
 --- !u!222 &1977225067
 CanvasRenderer:
   m_ObjectHideFlags: 0

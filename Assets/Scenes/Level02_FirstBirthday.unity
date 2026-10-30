@@ -3054,19 +3054,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: b5b8f51123af484bb126e840b218a606, type: 3}
+    m_Font: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
     m_FontSize: 36
     m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
+    m_BestFit: 1
+    m_MinSize: 16
+    m_MaxSize: 36
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u6293\u4F4F\u4F60\u559C\u6B22\u7684\u4E1C\u897F\u5427\u3002"
+  m_Text: Reach for something you love
 --- !u!222 &558752849
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5262,23 +5262,23 @@ MonoBehaviour:
   interactionCamera: {fileID: 1215320985}
   baby: {fileID: 2039692183}
   items:
-  - itemName: "\u526A\u5200"
+  - itemName: Scissors
     root: {fileID: 645077850}
     collider: {fileID: 645077851}
     gripPoint: {fileID: 744865524}
-  - itemName: "\u9F20\u6807"
+  - itemName: Computer mouse
     root: {fileID: 212249042}
     collider: {fileID: 212249043}
     gripPoint: {fileID: 1467725127}
-  - itemName: "\u753B\u7B14"
+  - itemName: Paintbrush
     root: {fileID: 963503670}
     collider: {fileID: 963503671}
     gripPoint: {fileID: 1574858335}
-  - itemName: "\u7EA2\u5305"
+  - itemName: Red envelope
     root: {fileID: 1105447818}
     collider: {fileID: 1105447819}
     gripPoint: {fileID: 927976633}
-  - itemName: "\u5C24\u514B\u91CC\u91CC"
+  - itemName: Ukulele
     root: {fileID: 1612270802}
     collider: {fileID: 1612270803}
     gripPoint: {fileID: 1872866822}
@@ -5848,19 +5848,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: b5b8f51123af484bb126e840b218a606, type: 3}
+    m_Font: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
     m_FontSize: 22
     m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
+    m_BestFit: 1
+    m_MinSize: 16
+    m_MaxSize: 22
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u62D6\u52A8\u5B9D\u5B9D\u7684\u624B\uFF0C\u6216\u628A\u559C\u6B22\u7684\u5C0F\u7269\u4EF6\u9001\u5230\u624B\u8FB9\u3002"
+  m_Text: Drag a hand or bring an item within reach
 --- !u!222 &1282857800
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8086,6 +8086,7 @@ MonoBehaviour:
   headScale: 1.95
   seatedRestPose: 1
   artProfile: {fileID: 11400000, guid: a36a4344afdc8a0478db9ae48821021c, type: 2}
+  uiFont: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
 --- !u!114 &2039692184
 MonoBehaviour:
   m_ObjectHideFlags: 0

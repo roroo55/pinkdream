@@ -29,7 +29,7 @@ namespace PinkDream.Editor
             circle = LoadSprite("Assets/PinkDream/Geometry/Circle.asset");
             square = LoadSprite("Assets/PinkDream/Geometry/Square.asset");
             material = AssetDatabase.LoadAssetAtPath<Material>("Assets/PinkDream/Geometry/RagdollGeometry.mat");
-            font = AssetDatabase.LoadAssetAtPath<Font>("Assets/PinkDream/Geometry/SceneUIFont.ttf");
+            font = AssetDatabase.LoadAssetAtPath<Font>("Assets/art/Date Night.ttf");
             string error = AssetDatabase.MoveAsset(OldPath, LevelPath);
             if (!string.IsNullOrEmpty(error))
                 throw new System.InvalidOperationException(error);
@@ -339,7 +339,7 @@ namespace PinkDream.Editor
             go.transform.SetParent(parent, false);
             var label = go.GetComponent<Text>();
             label.font = font;
-            label.text = text;
+            label.text = EnglishTypographyAuthoring.Translate(text);
             label.fontSize = size;
             label.color = Black;
             label.alignment = TextAnchor.MiddleCenter;

@@ -114,7 +114,7 @@ namespace PinkDream
             {
                 returnPromptShown = true;
                 if (restartHint != null)
-                    restartHint.text = "点击空白处，返回 Start 重新开始游戏。";
+                    restartHint.text = "Click an empty area to return to START";
             }
             // Releasing the finish cord is never treated as the restart click.
             if (!Input.GetMouseButton(0))

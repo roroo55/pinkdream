@@ -22,7 +22,7 @@ namespace PinkDream.Editor
             circle = LoadSprite(Geometry + "Circle.asset");
             square = LoadSprite(Geometry + "Square.asset");
             material = AssetDatabase.LoadAssetAtPath<Material>(Geometry + "RagdollGeometry.mat");
-            font = AssetDatabase.LoadAssetAtPath<Font>(Geometry + "SceneUIFont.ttf");
+            font = AssetDatabase.LoadAssetAtPath<Font>("Assets/art/Date Night.ttf");
 
             // Reuse the actual parents and their authored geometry, not doctors
             // or runtime-generated characters. The first level is never saved.
@@ -336,7 +336,7 @@ namespace PinkDream.Editor
             go.transform.SetParent(parent, false);
             var text = go.GetComponent<Text>();
             text.font = font;
-            text.text = line;
+            text.text = EnglishTypographyAuthoring.Translate(line);
             text.fontSize = fontSize;
             text.color = Ink;
             text.alignment = TextAnchor.MiddleCenter;

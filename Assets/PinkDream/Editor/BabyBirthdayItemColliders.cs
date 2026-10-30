@@ -12,6 +12,15 @@ namespace PinkDream.Editor
         // Bake in edit mode so both picking and grasping use the visible geometry.
         public static PolygonCollider2D Fit(Transform root, string itemName)
         {
+            // Display names are English; retain the authored geometry lookup names.
+            switch (itemName)
+            {
+                case "Scissors": itemName = "剪刀"; break;
+                case "Computer mouse": itemName = "鼠标"; break;
+                case "Paintbrush": itemName = "画笔"; break;
+                case "Red envelope": itemName = "红包"; break;
+                case "Ukulele": itemName = "尤克里里"; break;
+            }
             var paths = new List<Vector2[]>();
             foreach (SpriteRenderer renderer in root.GetComponentsInChildren<SpriteRenderer>())
             {

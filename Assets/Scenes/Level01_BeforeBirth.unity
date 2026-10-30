@@ -21404,6 +21404,7 @@ MonoBehaviour:
   headScale: 1
   seatedRestPose: 0
   artProfile: {fileID: 11400000, guid: 1dcc4f2f3a52d4a46a920834bfb21e7f, type: 2}
+  uiFont: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
 --- !u!114 &780010003
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32435,6 +32436,7 @@ MonoBehaviour:
   headScale: 1
   seatedRestPose: 0
   artProfile: {fileID: 11400000, guid: deab120aad50f73499621394fa00f110, type: 2}
+  uiFont: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
 --- !u!4 &1373915386
 Transform:
   m_ObjectHideFlags: 0
@@ -33142,19 +33144,19 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: b5b8f51123af484bb126e840b218a606, type: 3}
+    m_Font: {fileID: 12800000, guid: b07b2d0967c066d498b1822620723463, type: 3}
     m_FontSize: 36
     m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 10
-    m_MaxSize: 40
+    m_BestFit: 1
+    m_MinSize: 16
+    m_MaxSize: 36
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u624B\u7275\u624B\uFF0C\u4E00\u8D77\u63E1\u5200\u5207\u5F00\u86CB\u7CD5"
+  m_Text: Hold hands and cut the cake together
 --- !u!222 &1412179511
 CanvasRenderer:
   m_ObjectHideFlags: 0
