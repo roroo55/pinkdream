@@ -150,6 +150,7 @@ namespace PinkDream
                         continue;
                     held[hand] = i;
                     choices[i].item.SetParent(hand == 0 ? leftHandAnchor : rightHandAnchor, true);
+                    ItemContactFeedback.Play(choices[i].item);
                     foreach (SpriteRenderer sprite in choices[i].item.GetComponentsInChildren<SpriteRenderer>())
                         sprite.sortingOrder = 330 + sprite.sortingOrder % 10;
                     foreach (Canvas label in choices[i].item.GetComponentsInChildren<Canvas>())

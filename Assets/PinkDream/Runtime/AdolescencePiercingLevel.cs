@@ -99,6 +99,7 @@ namespace PinkDream
                 heldHand = hand;
                 // Keep the exact contact pose, with no attraction or grip-point snap.
                 piercingTool.SetParent(hand == 0 ? leftHandAnchor : rightHandAnchor, true);
+                ItemContactFeedback.Play(piercingTool);
                 foreach (SpriteRenderer renderer in piercingTool.GetComponentsInChildren<SpriteRenderer>())
                     renderer.sortingOrder = 340 + renderer.sortingOrder % 10;
                 foreach (Canvas label in piercingTool.GetComponentsInChildren<Canvas>())

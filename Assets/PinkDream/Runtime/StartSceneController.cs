@@ -158,6 +158,7 @@ namespace PinkDream
             holder = character;
             holderHand = hand;
             heldHandToLens = (Vector2)magnifier.position - holder.HandPosition(hand);
+            if (initialized) ItemContactFeedback.Play(magnifier);
         }
 
         private void UpdateDiscovery()

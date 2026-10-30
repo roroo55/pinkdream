@@ -189,6 +189,7 @@ namespace PinkDream
             }
             else
                 knife.position = new Vector3(grip.x, grip.y, knife.position.z);
+            ItemContactFeedback.Play(knife);
             gripGuide.SetActive(false);
             previousBlade = bladeCutPoint.position;
         }

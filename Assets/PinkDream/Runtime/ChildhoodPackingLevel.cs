@@ -104,6 +104,7 @@ namespace PinkDream
                     heldItems[hand] = i;
                     // Parenting preserves the actual touch position; no snap or attraction.
                     items[i].root.SetParent(hand == 0 ? leftHandAnchor : rightHandAnchor, true);
+                    ItemContactFeedback.Play(items[i].root);
                     SetItemOrder(items[i], 300);
                     foreach (Canvas label in items[i].root.GetComponentsInChildren<Canvas>())
                         label.enabled = false;

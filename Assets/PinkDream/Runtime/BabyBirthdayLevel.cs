@@ -127,6 +127,7 @@ namespace PinkDream
             GraspItem selected = items[index];
             // Keep the actual contact pose instead of snapping to a grip point.
             selected.root.SetParent(hand == 3 ? leftHandAnchor : rightHandAnchor, true);
+            ItemContactFeedback.Play(selected.root);
             Physics2D.SyncTransforms();
             feedbackText.text = "Item caught Moving to the next stage";
             // Only a local display name is used. No preference, career or item
