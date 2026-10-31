@@ -2,13 +2,14 @@ using UnityEngine;
 
 namespace PinkDream
 {
-    // Capture visual copies only; never modify character bones or colliders.
+    // Guide copies are lens-only; the optical view magnifies the whole world.
     public sealed class PiercingInspectionLens : MonoBehaviour
     {
         [SerializeField] private AdolescencePiercingLevel level;
         [SerializeField] private Transform magnifier;
         [SerializeField] private Collider2D[] magnifierColliders;
         [SerializeField] private Camera lensCamera;
+        [SerializeField] private WorldMagnifier worldLens;
         [SerializeField] private GameObject captureRoot;
         [SerializeField] private SpriteRenderer sourceHead, copyHead;
         [SerializeField] private Transform[] sourceEars, copyEars, earSpots;
@@ -17,7 +18,6 @@ namespace PinkDream
         [SerializeField] private float lensRadius = .62f;
         private Vector2 grabOffset;
         public bool IsDragging { get; private set; }
-        private bool rendering;
         private void Awake() { lensCamera.enabled = false; captureRoot.SetActive(true); }
         private void Start() { RefreshView(); }
         public bool BeginDrag(Vector2 pointer)
@@ -41,17 +41,14 @@ namespace PinkDream
         }
         public void RefreshView()
         {
-            if (rendering || lensCamera == null || sourceHead == null) return;
-            rendering = true;
-            bool active = captureRoot.activeSelf; captureRoot.SetActive(true);
-            CopyWorld(sourceHead.transform, copyHead.transform); copyHead.sprite = sourceHead.sprite; copyHead.color = sourceHead.color; copyHead.flipX = sourceHead.flipX; copyHead.flipY = sourceHead.flipY;
-            for (int i = 0; i < sourceEars.Length; i++) { CopyWorld(sourceEars[i], copyEars[i]); CopyChildren(sourceEars[i], copyEars[i]); }
-            for (int i = 0; i < captureSuggestions.Length; i++)
-                if (!sourceEars[i].Find("Mark").gameObject.activeSelf && !HasEarring(sourceEars[i])) captureSuggestions[i].SetActive(true);
-            if (!lensCamera.targetTexture.IsCreated()) lensCamera.targetTexture.Create();
-            lensCamera.transform.position = new Vector3(magnifier.position.x, magnifier.position.y, -10);
-            lensCamera.orthographicSize = lensRadius / magnification;
-            lensCamera.Render(); captureRoot.SetActive(active); rendering = false;
+            captureRoot.SetActive(true); copyHead.enabled = false;
+            for (int i = 0; i < sourceEars.Length; i++)
+            {
+                CopyWorld(sourceEars[i], copyEars[i]);
+                bool suggest = !sourceEars[i].Find("Guide").gameObject.activeSelf && !sourceEars[i].Find("Mark").gameObject.activeSelf && !HasEarring(sourceEars[i]);
+                foreach (Transform child in copyEars[i]) child.gameObject.SetActive(child.gameObject == captureSuggestions[i] && suggest);
+            }
+            worldLens.RenderView(lensRadius, magnification);
         }
         private static bool HasEarring(Transform root)
         {
@@ -60,15 +57,5 @@ namespace PinkDream
         }
         private static void CopyWorld(Transform source, Transform target)
         { target.SetPositionAndRotation(source.position, source.rotation); target.localScale = source.lossyScale; }
-        private static void CopyChildren(Transform source, Transform target)
-        {
-            for (int i = 0; i < source.childCount; i++)
-            {
-                Transform a = source.GetChild(i), b = target.GetChild(i);
-                b.localPosition = a.localPosition; b.localRotation = a.localRotation; b.localScale = a.localScale; b.gameObject.SetActive(a.gameObject.activeSelf);
-                if (a.TryGetComponent(out SpriteRenderer sr) && b.TryGetComponent(out SpriteRenderer cr)) { cr.color = sr.color; cr.sprite = sr.sprite; }
-                CopyChildren(a, b);
-            }
-        }
     }
 }

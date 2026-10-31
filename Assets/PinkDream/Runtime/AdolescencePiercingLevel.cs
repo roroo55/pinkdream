@@ -42,6 +42,7 @@ namespace PinkDream
         [SerializeField] private SpriteRenderer[] progressDots;
         [SerializeField] private GameObject[] loadedIcons;
         [SerializeField] private Transform completionEffects;
+        [SerializeField] private LevelCompletionGlow completionGlow;
 
         private readonly CircleCollider2D[] palms = new CircleCollider2D[2];
         private readonly int[] held = { -1, -1 };
@@ -215,7 +216,7 @@ namespace PinkDream
             if (!Both(marked)) { Refuse("Clean and mark both ears before loading a stud"); ReturnToTray(index); return; }
             if (loaded >= 0) { Refuse("The machine holds only one stud"); ReturnToTray(index); return; }
             int style = (int)objects[index].style;
-            if (chosenStyle >= 0 && chosenStyle != style) { Refuse("Remember the same style as the left ear"); ReturnToTray(index); return; }
+            if (chosenStyle >= 0 && chosenStyle != style) { Refuse("Remember your chosen stud style"); ReturnToTray(index); return; }
             chosenStyle = style; loaded = index; Release(index); objects[index].collider.enabled = false; objects[index].root.gameObject.SetActive(false);
             RefreshProgress(); ShowNextStep();
         }
@@ -242,9 +243,8 @@ namespace PinkDream
         {
             if (!Both(revealed) || !Both(cleaned) || !Both(marked)) { Refuse("Discover clean and mark both ears before using the machine"); return; }
             if (pierced[ear]) { Refuse("This ear is finished   Use the other ear"); return; }
-            if (ear == 1 && !pierced[0]) { Refuse("Start with the left ear mark"); return; }
             if (loaded < 0) { Refuse("The machine is empty   Load one stud"); return; }
-            if ((int)objects[loaded].style != chosenStyle) { Refuse("Reload the same style as the left ear"); return; }
+            if ((int)objects[loaded].style != chosenStyle) { Refuse("Reload the same chosen stud style"); return; }
             pierced[ear] = true; earStyles[ear] = chosenStyle; consumed[loaded] = true; loaded = -1;
             RefreshProgress(); FlashLight(Green);
             if (Both(pierced) && earStyles[0] == earStyles[1])
@@ -286,11 +286,13 @@ namespace PinkDream
                 !Both(marked) ? "Touch each suggested spot with the marker and release" :
                 chosenStyle < 0 ? "Choose a stud and load it into the machine" :
                 loaded < 0 ? "Machine empty   Reload the same style" :
+                !pierced[0] && !pierced[1] ? "Align the machine with either ear mark and release" :
                 !pierced[0] ? "Align the machine with the left mark and release" :
                 !pierced[1] ? "Align the machine with the right mark and release" : "Both ears match";
         }
         private void Celebrate()
         {
+            completionGlow?.Play();
             completionEffects.gameObject.SetActive(true);
             foreach (SpriteRenderer sparkle in completionEffects.GetComponentsInChildren<SpriteRenderer>())
             {

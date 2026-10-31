@@ -16,6 +16,12 @@ namespace PinkDream
         [SerializeField] private GameObject[] flames;
         [SerializeField] private ParticleSystem[] confetti;
         [SerializeField] private Transform[] balloons;
+        [SerializeField] private Transform blowTarget;
+        [SerializeField] private LineRenderer[] breathLines;
+        [InspectorName("点亮蜡烛后的停留时间（秒）"), Min(0)]
+        [SerializeField] private float candleHoldSeconds = .65f;
+        [InspectorName("吹灭蜡烛时间（秒）"), Min(.1f)]
+        [SerializeField] private float blowSeconds = .75f;
         [InspectorName("女孩抬手庆祝时间（秒）"), Min(0.01f)]
         [SerializeField] private float poseSeconds = 1f;
         [InspectorName("礼花气球保持时间（秒）"), Min(0)]
@@ -39,6 +45,7 @@ namespace PinkDream
         private float age;
         private bool poseFinished, effectsFinished, emissionStopped;
         private bool returnPromptShown, returnClickArmed, returning;
+        private bool partyStarted, candlesExtinguished;
         private MaterialPropertyBlock fadeBlock;
         private static readonly int Tint = Shader.PropertyToID("_Color");
         public bool HasStarted { get; private set; }
@@ -53,12 +60,17 @@ namespace PinkDream
             for (int i = 0; i < startAngles.Length; i++)
                 startAngles[i] = girl.Model.Parts[i].Angle * Mathf.Rad2Deg;
             startTorso = girl.Model.Parts[0].Position;
-            foreach (GameObject face in neutralFace)
-                face.SetActive(false);
-            happyFace.SetActive(true);
             cakeGlow.SetActive(true);
             foreach (GameObject flame in flames)
                 flame.SetActive(true);
+        }
+
+        private void BeginParty()
+        {
+            partyStarted = true;
+            age = 0;
+            foreach (GameObject face in neutralFace) face.SetActive(false);
+            happyFace.SetActive(true);
             fadeBlock = new MaterialPropertyBlock();
             float depth = Vector3.Dot(Vector3.zero - sceneCamera.transform.position, sceneCamera.transform.forward);
             for (int i = 0; i < confetti.Length; i++)
@@ -99,11 +111,60 @@ namespace PinkDream
             if (!HasStarted)
                 return;
             age += Time.unscaledDeltaTime;
+            if (!partyStarted)
+            {
+                if (age < candleHoldSeconds) return;
+                float progress = Mathf.Clamp01((age - candleHoldSeconds) / Mathf.Max(.1f, blowSeconds));
+                AnimateBlow(progress);
+                if (progress >= 1) BeginParty();
+                return;
+            }
             if (!poseFinished)
                 AnimateHappyPose();
             if (!effectsFinished)
                 AnimateEffects();
             UpdateReturnToStart();
+        }
+
+        private void AnimateBlow(float progress)
+        {
+            var model = girl.Model;
+            float direction = Mathf.Sign(blowTarget.position.x - startTorso.x);
+            float lean = Mathf.Sin(progress * Mathf.PI);
+            model.Parts[0].Position = startTorso + new Vector2(direction * .16f, -.025f) * lean;
+            for (int i = 0; i < startAngles.Length; i++) model.Parts[i].Angle = (startAngles[i] - (i == 0 ? direction * 12f * lean : 0)) * Mathf.Deg2Rad;
+            ReconnectPose();
+            Vector3 from = model.Parts[1].WorldPoint(new Vector2(direction * .3f, 0));
+            Vector3 to = blowTarget.position;
+            float alpha = Mathf.Sin(Mathf.Clamp01(progress / .8f) * Mathf.PI);
+            for (int lineIndex = 0; lineIndex < breathLines.Length; lineIndex++)
+            {
+                LineRenderer line = breathLines[lineIndex]; line.enabled = progress > .05f && progress < .92f;
+                Color color = line.startColor; color.a = alpha * .65f; line.startColor = line.endColor = color;
+                float leading = Mathf.Clamp01(progress * 2f - lineIndex * .12f);
+                float trailing = Mathf.Max(0, leading - .28f);
+                for (int point = 0; point < line.positionCount; point++)
+                {
+                    float t = Mathf.Lerp(trailing, leading, point / (float)(line.positionCount - 1));
+                    Vector3 p = Vector3.Lerp(from, to, t); p.y += Mathf.Sin(t * Mathf.PI) * (.16f + lineIndex * .1f); line.SetPosition(point, p);
+                }
+            }
+            if (!candlesExtinguished && progress >= .65f)
+            {
+                candlesExtinguished = true; foreach (GameObject flame in flames) flame.SetActive(false); cakeGlow.SetActive(false);
+            }
+        }
+
+        private void ReconnectPose()
+        {
+            var model = girl.Model;
+            foreach (PoseRagdollModel.Joint joint in model.Joints)
+            {
+                if (joint.B == 1) continue;
+                var parent = model.Parts[joint.A]; var child = model.Parts[joint.B];
+                child.Position = parent.WorldPoint(joint.AnchorA) - child.Rotate(joint.AnchorB);
+            }
+            model.AlignHeadWithTorso(); girl.RefreshPose();
         }
 
         private void UpdateReturnToStart()
@@ -244,7 +305,7 @@ namespace PinkDream
                 particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             foreach (Transform balloon in balloons)
                 balloon.gameObject.SetActive(false);
-            // The lit cake, chosen combination and happy pose remain.
+            // The decorated cake with extinguished candles and the happy pose remain.
         }
     }
 }

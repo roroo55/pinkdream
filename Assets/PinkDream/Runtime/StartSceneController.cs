@@ -16,6 +16,7 @@ namespace PinkDream
         [SerializeField] private int initialHolderHand = 5;
         [Header("B 超与真实局部放大")]
         [SerializeField] private Camera magnifierCamera;
+        [SerializeField] private WorldMagnifier worldLens;
         [SerializeField] private Transform babyFocus;
         [SerializeField] private Collider2D ultrasoundBounds;
         [InspectorName("放大倍率"), Range(1.2f, 4)]
@@ -86,11 +87,7 @@ namespace PinkDream
         {
             if (!initialized || loading || (!captureDirty && magnifier.position == lastCapturedPosition))
                 return;
-            // The authored camera only sees the scan's visual layer, so neither
-            // the parents nor the lens can render recursively into the lens.
-            magnifierCamera.transform.position = new Vector3(magnifier.position.x, magnifier.position.y, -10);
-            magnifierCamera.orthographicSize = lensWorldRadius / magnification;
-            magnifierCamera.Render();
+            worldLens.RenderView(lensWorldRadius, magnification);
             lastCapturedPosition = magnifier.position;
             captureDirty = false;
         }

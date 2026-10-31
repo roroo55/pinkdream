@@ -43,6 +43,7 @@ namespace PinkDream
         [SerializeField] private Transform zipperHandle, zipperStart, zipperEnd;
         [SerializeField] private Collider2D zipperCollider;
         [SerializeField] private GameObject openBag, closedBag;
+        [SerializeField] private LevelCompletionGlow completionGlow;
         [SerializeField] private Text progressText, feedbackText;
         [InspectorName("成功关闭书包后的停留时间（秒）"), Min(0)]
         [SerializeField] private float completionHoldSeconds = 2f;
@@ -179,6 +180,7 @@ namespace PinkDream
             IsComplete = true; openBag.SetActive(false); closedBag.SetActive(true);
             foreach (int index in occupants) items[index].root.gameObject.SetActive(false);
             feedbackText.text = "Ready for tomorrow   Moving to the next stage";
+            completionGlow?.Play();
             StartCoroutine(ContinueToNextLevel());
         }
         private void ReturnZipper(string message)

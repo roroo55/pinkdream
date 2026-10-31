@@ -13,6 +13,7 @@ namespace PinkDream
         [SerializeField] private Collider2D[] magnifierColliders;
         [SerializeField] private Collider2D cardZone;
         [SerializeField] private Camera lensCamera;
+        [SerializeField] private WorldMagnifier worldLens;
         [SerializeField] private GameObject requirements;
         [SerializeField] private GameObject hiddenMarks;
         [SerializeField] private GameObject rainyWeather, sunnyWeather;
@@ -30,7 +31,8 @@ namespace PinkDream
             Revealed = false;
             rainyWeather.SetActive(rainy); sunnyWeather.SetActive(!rainy);
             foreach (RequirementIcon icon in icons) icon.visual.SetActive(icon.item == side || icon.item == back || icon.item == main);
-            requirements.SetActive(false); hiddenMarks.SetActive(true);
+            // The camera layers keep the actual requirements visible only in the glass.
+            requirements.SetActive(true); hiddenMarks.SetActive(true);
         }
         public bool BeginDrag(Vector2 pointer)
         {
@@ -49,17 +51,14 @@ namespace PinkDream
             Physics2D.SyncTransforms();
             if (!Revealed && cardZone.OverlapPoint(magnifier.position))
             {
-                Revealed = true; requirements.SetActive(true); hiddenMarks.SetActive(false);
+                Revealed = true;
             }
             RefreshLens();
         }
         public void EndDrag() { IsDragging = false; }
         private void RefreshLens()
         {
-            if (lensCamera.targetTexture != null && !lensCamera.targetTexture.IsCreated()) lensCamera.targetTexture.Create();
-            lensCamera.transform.position = new Vector3(magnifier.position.x, magnifier.position.y, -10);
-            lensCamera.orthographicSize = lensRadius / magnification;
-            lensCamera.Render();
+            worldLens.RenderView(lensRadius, magnification);
         }
     }
 }
