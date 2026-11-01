@@ -1,9 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace PinkDream
 {
     /// <summary>Coordinates two unchanged frozen ragdolls and the cake reveal.</summary>
-    public sealed class BeforeBirthLevel : MonoBehaviour
+    public sealed class BeforeBirthLevel : MonoBehaviour, IInteractionHintSource
     {
         [Header("Scene characters")]
         [SerializeField] private Camera interactionCamera;
@@ -34,8 +35,10 @@ namespace PinkDream
         private bool draggingKnife;
         private Vector2 knifeGrabOffset;
         private int motherHand = -1, fatherHand = -1;
-        private bool enteredCake;
+        private bool enteredCake, knifeNeedsSeparation;
         private Vector2 previousBlade;
+
+        [SerializeField] private PlayerInteractionAssist interactionAssist;
 
         private void Awake()
         {
@@ -63,8 +66,21 @@ namespace PinkDream
                 return;
             }
             Vector2 pointer = mother.ScreenToWorld(screen);
+            if (Input.GetMouseButtonDown(1))
+            {
+                bool putDown = step == Step.CutCake || draggingKnife;
+                EndGesture();
+                if (putDown) ItemContactFeedback.PlayDrop(knife);
+                if (step == Step.CutCake)
+                {
+                    step = Step.GripKnife; enteredCake = false; knifeNeedsSeparation = true;
+                    gripGuide.SetActive(true); interactionAssist?.MarkActivity();
+                }
+                return;
+            }
             if (Input.GetMouseButtonDown(0))
                 BeginGesture(pointer);
+            interactionAssist?.ObserveGesture(draggingKnife || activeCharacter != null);
             if ((Input.GetMouseButton(0) || Input.GetMouseButtonUp(0)) &&
                 (activeCharacter != null || draggingKnife))
                 MoveGesture(pointer);
@@ -78,6 +94,7 @@ namespace PinkDream
             previousBlade = bladeCutPoint.position;
             if (knifeCollider.OverlapPoint(pointer))
             {
+                ItemContactFeedback.CancelDrop(knife);
                 draggingKnife = true;
                 knifeGrabOffset = (Vector2)knife.position - pointer;
                 if (step >= Step.CutCake)
@@ -177,8 +194,13 @@ namespace PinkDream
         private void TryGripKnife()
         {
             Vector2 grip = mother.HandPosition(motherHand);
-            if (Vector2.Distance(grip, knife.position) > knifeGripDistance)
+            float distance = Vector2.Distance(grip, knife.position);
+            if (knifeNeedsSeparation)
+            {
+                if (distance > knifeGripDistance + .08f) knifeNeedsSeparation = false;
                 return;
+            }
+            if (distance > knifeGripDistance) return;
             step = Step.CutCake;
             enteredCake = false;
             if (draggingKnife)
@@ -212,9 +234,18 @@ namespace PinkDream
                 Reveal();
         }
 
+        public bool CanOfferHints => step != Step.Revealed;
+        public void CollectHintTargets(List<Transform> targets)
+        {
+            if (step == Step.JoinHands) { targets.Add(mother.transform); targets.Add(father.transform); }
+            else if (step == Step.GripKnife) targets.Add(knife);
+            else if (step == Step.CutCake) targets.Add(cakeCutZone.transform);
+        }
+
         private void Reveal()
         {
             step = Step.Revealed;
+            GameplaySoundEffects.PlayLevelSuccess();
             pinkFilling.SetActive(true);
             leftCakeHalf.localPosition += Vector3.left * cakeSeparation;
             rightCakeHalf.localPosition += Vector3.right * cakeSeparation;

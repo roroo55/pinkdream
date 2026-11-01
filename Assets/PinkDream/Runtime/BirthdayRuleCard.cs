@@ -13,6 +13,8 @@ namespace PinkDream
         [SerializeField, Min(1)] private float magnification = 1.6f;
         [SerializeField] private float lensRadius = .6f;
         private Vector2 grabOffset;
+        public Transform Magnifier => magnifier;
+        public Transform CardTarget => cardZone.transform;
         public bool IsDragging { get; private set; }
         public bool Revealed { get; private set; }
         private void Awake() { lensCamera.enabled = false; rules.SetActive(true); covers.SetActive(true); }
@@ -20,7 +22,7 @@ namespace PinkDream
         public bool BeginDrag(Vector2 pointer)
         {
             foreach (var collider in magnifierColliders) if (collider.OverlapPoint(pointer))
-            { IsDragging = true; grabOffset = (Vector2)magnifier.position - pointer; return true; }
+            { ItemContactFeedback.CancelDrop(magnifier); IsDragging = true; grabOffset = (Vector2)magnifier.position - pointer; return true; }
             return false;
         }
         public void MoveDrag(Vector2 pointer)

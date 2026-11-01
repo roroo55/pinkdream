@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections;
 using DG.Tweening;
 using UnityEngine;
@@ -5,7 +6,7 @@ using UnityEngine.UI;
 
 namespace PinkDream
 {
-    public sealed class AdolescencePiercingLevel : MonoBehaviour
+    public sealed class AdolescencePiercingLevel : MonoBehaviour, IInteractionHintSource
     {
         public enum PropKind { Cotton, Marker, Machine, Stud }
         public enum StudStyle { Star, Ring, Spike }
@@ -62,6 +63,8 @@ namespace PinkDream
         public bool IsComplete { get; private set; }
         private static readonly Color Neutral = new Color32(86,93,99,255), Cyan = new Color32(113,221,222,255), Green = new Color32(148,228,185,255), Gold = new Color32(244,205,117,255);
 
+        [SerializeField] private PlayerInteractionAssist interactionAssist;
+
         private void Awake()
         {
             girl.ReadMouseInput = false;
@@ -85,7 +88,9 @@ namespace PinkDream
             Vector2 screen = Input.mousePosition;
             if (!Application.isFocused || !interactionCamera.pixelRect.Contains(screen)) { EndGesture(false); return; }
             Vector2 pointer = girl.ScreenToWorld(screen);
+            if (Input.GetMouseButtonDown(1)) { PutDownItems(); return; }
             if (Input.GetMouseButtonDown(0)) BeginGesture(pointer);
+            interactionAssist?.ObserveGesture(dragging || inspectionLens.IsDragging);
             if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0))
             {
                 if (inspectionLens.IsDragging) inspectionLens.MoveDrag(pointer);
@@ -132,6 +137,7 @@ namespace PinkDream
         }
         private bool Eligible(int i)
         {
+            if (interactionAssist != null && !interactionAssist.CanPickup(objects[i].collider)) return false;
             if (consumed[i] || returning[i] || i == loaded || held[0] == i || held[1] == i || !objects[i].root.gameObject.activeInHierarchy) return false;
             if (objects[i].kind == PropKind.Cotton && Both(cleaned) || objects[i].kind == PropKind.Marker && Both(marked)) return false;
             return objects[i].kind != PropKind.Stud || Both(marked);
@@ -158,11 +164,41 @@ namespace PinkDream
             ItemContactFeedback.Play(objects[index].root);
             if (dragging) activeProp = index;
         }
-        private void Release(int index)
+        private void Release(int index, bool dropped = false)
         {
             for (int hand = 0; hand < 2; hand++) if (held[hand] == index) held[hand] = -1;
             objects[index].root.SetParent(restParents[index], true); mustSeparate[index] = true;
+            if (dropped) ItemContactFeedback.PlayDrop(objects[index].root);
             for (int r = 0; r < renderers[index].Length; r++) renderers[index][r].sortingOrder = originalOrders[index][r];
+        }
+        private void PutDownItems()
+        {
+            bool putDown = inspectionLens.IsDragging;
+            EndGesture(false);
+            if (putDown) ItemContactFeedback.PlayDrop(inspectionLens.Magnifier);
+            for (int hand = 0; hand < held.Length; hand++)
+            {
+                int index = held[hand]; if (index < 0) continue;
+                Release(index, true); mustSeparate[index] = false; interactionAssist?.SuppressPickup(objects[index].collider, palms);
+                interactionAssist?.MarkActivity();
+            }
+        }
+        public bool CanOfferHints => !IsComplete;
+        public void CollectHintTargets(List<Transform> targets)
+        {
+            if (!Both(revealed)) { targets.Add(inspectionLens.Magnifier); return; }
+            PropKind needed = !Both(cleaned) ? PropKind.Cotton : !Both(marked) ? PropKind.Marker : loaded >= 0 ? PropKind.Machine : PropKind.Stud;
+            bool carrying = false;
+            foreach (int index in held) if (index >= 0 && objects[index].kind == needed) carrying = true;
+            if (carrying)
+            {
+                if (needed == PropKind.Stud) { targets.Add(loadingZone.transform); return; }
+                bool[] done = needed == PropKind.Cotton ? cleaned : needed == PropKind.Marker ? marked : pierced;
+                for (int ear = 0; ear < 2; ear++) if (!done[ear]) targets.Add(ears[ear].lobe.transform);
+                return;
+            }
+            for (int i = 0; i < objects.Length; i++)
+                if (objects[i].kind == needed && !consumed[i] && !returning[i] && i != loaded && objects[i].root.gameObject.activeInHierarchy) targets.Add(objects[i].root);
         }
         private void ReturnToTray(int index)
         {
@@ -192,7 +228,7 @@ namespace PinkDream
                 {
                     int item = held[hand]; if (item < 0 || activeProp >= 0 && item != activeProp) continue;
                     bool atEar = Touches(objects[item].tip ?? objects[item].collider, ears[0].lobe) || Touches(objects[item].tip ?? objects[item].collider, ears[1].lobe);
-                    if (!atEar && (objects[item].kind != PropKind.Stud || !Touches(objects[item].collider, loadingZone))) Release(item);
+                    if (!atEar && (objects[item].kind != PropKind.Stud || !Touches(objects[item].collider, loadingZone))) Release(item, true);
                 }
             }
             activeProp = -1;
@@ -250,7 +286,8 @@ namespace PinkDream
             RefreshProgress(); FlashLight(Green);
             if (Both(pierced) && earStyles[0] == earStyles[1])
             {
-                IsComplete = true; feedbackMessages.Show("Both ears match   Moving to the next stage");
+                IsComplete = true; GameplaySoundEffects.PlayLevelSuccess();
+                feedbackMessages.Show("Both ears match   Moving to the next stage");
                 Celebrate(); if (Application.isPlaying) StartCoroutine(ContinueToNextLevel());
             }
             else ShowNextStep();

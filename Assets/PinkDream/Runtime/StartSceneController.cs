@@ -1,10 +1,11 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace PinkDream
 {
-    public sealed class StartSceneController : MonoBehaviour
+    public sealed class StartSceneController : MonoBehaviour, IInteractionHintSource
     {
         [Header("场景中的父母与放大镜")]
         [SerializeField] private FrozenRagdoll mother;
@@ -42,7 +43,11 @@ namespace PinkDream
         private float dwellTime;
         private bool draggingLens, alignedLastFrame, initialized, captureDirty = true;
         private bool loading;
+        private FrozenRagdoll releasedHolder;
+        private int releasedHand;
         private Vector3 lastCapturedPosition;
+
+        [SerializeField] private PlayerInteractionAssist interactionAssist;
 
         private void Awake()
         {
@@ -74,8 +79,21 @@ namespace PinkDream
                 return;
             }
             Vector2 pointer = mother.ScreenToWorld(screen);
+            if (Input.GetMouseButtonDown(1))
+            {
+                bool putDown = holder != null || draggingLens;
+                EndGesture();
+                if (putDown) ItemContactFeedback.PlayDrop(magnifier);
+                if (holder != null)
+                {
+                    releasedHolder = holder; releasedHand = holderHand; holder = null;
+                    interactionAssist?.MarkActivity();
+                }
+                return;
+            }
             if (Input.GetMouseButtonDown(0))
                 BeginGesture(pointer);
+            interactionAssist?.ObserveGesture(draggingLens || activeCharacter != null);
             if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0))
                 MoveGesture(pointer);
             if (!Input.GetMouseButton(0))
@@ -99,6 +117,7 @@ namespace PinkDream
             {
                 if (!collider.OverlapPoint(pointer))
                     continue;
+                ItemContactFeedback.CancelDrop(magnifier);
                 draggingLens = true;
                 lensGrabOffset = (Vector2)magnifier.position - pointer;
                 if (holder != null)
@@ -117,6 +136,8 @@ namespace PinkDream
 
         private void MoveGesture(Vector2 pointer)
         {
+            if (releasedHolder != null && Vector2.Distance(releasedHolder.HandPosition(releasedHand), magnifierGrip.position) > .34f)
+                releasedHolder = null;
             if (draggingLens)
             {
                 Vector2 position = pointer + lensGrabOffset;
@@ -134,7 +155,7 @@ namespace PinkDream
                 else
                 {
                     int part = activeCharacter.Model.GrabbedPart;
-                    if ((part == 3 || part == 5) &&
+                    if (!(activeCharacter == releasedHolder && part == releasedHand) && (part == 3 || part == 5) &&
                         Vector2.Distance(activeCharacter.HandPosition(part), magnifierGrip.position) < 0.28f)
                         SetHolder(activeCharacter, part);
                 }
@@ -156,6 +177,12 @@ namespace PinkDream
             holderHand = hand;
             heldHandToLens = (Vector2)magnifier.position - holder.HandPosition(hand);
             if (initialized) ItemContactFeedback.Play(magnifier);
+        }
+
+        public bool CanOfferHints => initialized && !loading;
+        public void CollectHintTargets(List<Transform> targets)
+        {
+            targets.Add(magnifier); targets.Add(ultrasoundBounds.transform);
         }
 
         private void UpdateDiscovery()
@@ -181,6 +208,7 @@ namespace PinkDream
                 return;
             EndGesture();
             loading = SceneFadeTransition.Load(firstLevelScene);
+            if (loading) GameplaySoundEffects.PlayLevelSuccess();
         }
 
         private void ResetDiscovery()

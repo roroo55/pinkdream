@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace PinkDream
 {
-    public sealed class ComingOfAgeLevel : MonoBehaviour
+    public sealed class ComingOfAgeLevel : MonoBehaviour, IInteractionHintSource
     {
         public enum DecorationMotion { Still, Flower, Star, Candy }
         public enum ShapeKind { Heart, Star, Flower, Bow, Diamond }
@@ -66,6 +66,8 @@ namespace PinkDream
         private Tween cordReturn;
         public bool HasFinished { get; private set; }
 
+        [SerializeField] private PlayerInteractionAssist interactionAssist;
+
         private void Awake()
         {
             girl.ReadMouseInput = false;
@@ -92,7 +94,9 @@ namespace PinkDream
             Vector2 screen = Input.mousePosition;
             if (!Application.isFocused || !interactionCamera.pixelRect.Contains(screen)) { EndGesture(false); return; }
             Vector2 pointer = girl.ScreenToWorld(screen);
+            if (Input.GetMouseButtonDown(1)) { PutDownItems(); return; }
             if (Input.GetMouseButtonDown(0)) BeginGesture(pointer);
+            interactionAssist?.ObserveGesture(draggingGirl || draggingCord || birthdayCard.IsDragging);
             if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0)) MoveGesture(pointer);
             if (!Input.GetMouseButton(0)) EndGesture(Input.GetMouseButtonUp(0));
         }
@@ -134,7 +138,7 @@ namespace PinkDream
             if (!draggingGirl || girl.Model.GrabWorld == pointer) return;
             girl.MoveControlledDrag(pointer); Physics2D.SyncTransforms(); TryTakeItems();
         }
-        private bool Eligible(int index) => !settling[index] && held[0] != index && held[1] != index;
+        private bool Eligible(int index) => (interactionAssist == null || interactionAssist.CanPickup(choices[index].collider)) && !settling[index] && held[0] != index && held[1] != index;
         private void TryTakeItems()
         {
             for (int i = 0; i < choices.Length; i++)
@@ -156,11 +160,37 @@ namespace PinkDream
             ItemContactFeedback.Play(choices[index].item);
             feedbackMessages.Show("Touch an empty cake place with the decoration then release");
         }
-        private void Release(int index)
+        private void Release(int index, bool dropped = false)
         {
             for (int hand = 0; hand < 2; hand++) if (held[hand] == index) held[hand] = -1;
             choices[index].item.SetParent(looseItems, true); mustSeparate[index] = true;
+            if (dropped) ItemContactFeedback.PlayDrop(choices[index].item);
             for (int r = 0; r < orders[index].Length; r++) renderers[index][r].sortingOrder = orders[index][r];
+        }
+        private void PutDownItems()
+        {
+            bool putDown = birthdayCard.IsDragging;
+            EndGesture(false);
+            if (putDown) ItemContactFeedback.PlayDrop(birthdayCard.Magnifier);
+            for (int hand = 0; hand < held.Length; hand++)
+            {
+                int index = held[hand]; if (index < 0) continue;
+                Release(index, true); mustSeparate[index] = false; interactionAssist?.SuppressPickup(choices[index].collider, palms);
+                interactionAssist?.MarkActivity();
+            }
+        }
+        public bool CanOfferHints => !HasFinished;
+        public void CollectHintTargets(List<Transform> targets)
+        {
+            if (!birthdayCard.Revealed) { targets.Add(birthdayCard.Magnifier); targets.Add(birthdayCard.CardTarget); return; }
+            bool full = true; foreach (int item in occupants) if (item < 0) full = false;
+            if (full) { targets.Add(pullHandle); return; }
+            if (held[0] >= 0 || held[1] >= 0)
+            {
+                for (int s = 0; s < slots.Length; s++) if (occupants[s] < 0) targets.Add(slots[s].zone.transform);
+                return;
+            }
+            for (int i = 0; i < choices.Length; i++) if (!settling[i] && slotOf[i] < 0) targets.Add(choices[i].item);
         }
         private void Place(int index, int slot)
         {
@@ -191,7 +221,7 @@ namespace PinkDream
                     if (occupants[touched] < 0) Place(index, touched);
                     else feedbackMessages.Show("That place is full   Take its decoration out first");
                 }
-                else Release(index);
+                else Release(index, true);
             }
         }
         // Results identify rules only, never an individual piece or a suggested move.
@@ -228,7 +258,7 @@ namespace PinkDream
             {
                 feedbackMessages.Show("Check the red rule icons   Keep your cake and try again"); ReturnCord(); return;
             }
-            HasFinished = true; EndGesture(false);
+            HasFinished = true; GameplaySoundEffects.PlayLevelSuccess(); EndGesture(false);
             for (int hand = 0; hand < 2; hand++) if (held[hand] >= 0) Release(held[hand]);
             finishControl.SetActive(false); birthdayCard.HideForCelebration();
             foreach (var hint in preparationHints) hint.SetActive(false);

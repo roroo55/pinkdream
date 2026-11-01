@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections;
 using DG.Tweening;
 using UnityEngine;
@@ -5,7 +6,7 @@ using UnityEngine.UI;
 
 namespace PinkDream
 {
-    public sealed class BabyBirthdayLevel : MonoBehaviour
+    public sealed class BabyBirthdayLevel : MonoBehaviour, IInteractionHintSource
     {
         public enum PairKind { Painting, Building, Music, Medicine }
         [System.Serializable]
@@ -44,11 +45,22 @@ namespace PinkDream
 
         private readonly int[] held = { -1, -1 };
         private Sequence rejection;
+        private Renderer[][] itemRenderers;
+        private int[][] itemOrders;
         public bool IsComplete { get; private set; }
+
+        [SerializeField] private PlayerInteractionAssist interactionAssist;
 
         private void Awake()
         {
             baby.ReadMouseInput = false;
+            itemRenderers = new Renderer[items.Length][]; itemOrders = new int[items.Length][];
+            for (int i = 0; i < items.Length; i++)
+            {
+                itemRenderers[i] = items[i].root.GetComponentsInChildren<Renderer>(true);
+                itemOrders[i] = new int[itemRenderers[i].Length];
+                for (int j = 0; j < itemRenderers[i].Length; j++) itemOrders[i][j] = itemRenderers[i][j].sortingOrder;
+            }
             leftPalm = leftHandAnchor.parent.GetComponent<CircleCollider2D>();
             rightPalm = rightHandAnchor.parent.GetComponent<CircleCollider2D>();
         }
@@ -58,7 +70,9 @@ namespace PinkDream
             Vector2 screen = Input.mousePosition;
             if (!Application.isFocused || !interactionCamera.pixelRect.Contains(screen)) { EndGesture(); return; }
             Vector2 pointer = baby.ScreenToWorld(screen);
+            if (Input.GetMouseButtonDown(1)) { PutDownItems(); return; }
             if (Input.GetMouseButtonDown(0)) BeginGesture(pointer);
+            interactionAssist?.ObserveGesture(draggingBaby || draggingItem >= 0);
             if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0)) MoveGesture(pointer);
             if (!Input.GetMouseButton(0)) EndGesture();
         }
@@ -76,6 +90,7 @@ namespace PinkDream
             for (int i = items.Length - 1; i >= 0; i--)
             {
                 if (held[0] == i || held[1] == i || !items[i].collider.OverlapPoint(pointer)) continue;
+                ItemContactFeedback.CancelDrop(items[i].root);
                 draggingItem = i;
                 itemGrabOffset = (Vector2)items[i].root.position - pointer;
                 return;
@@ -107,6 +122,7 @@ namespace PinkDream
             for (int i = 0; i < items.Length; i++)
             {
                 if (held[0] == i || held[1] == i || draggingItem >= 0 && i != draggingItem) continue;
+                if (interactionAssist != null && !interactionAssist.CanPickup(items[i].collider)) continue;
                 if (firstHand < 0 && !items[i].isMainItem) continue;
                 for (int hand = 0; hand < held.Length; hand++)
                 {
@@ -143,12 +159,35 @@ namespace PinkDream
             if (items[held[0]].pair == items[held[1]].pair)
             {
                 IsComplete = true;
+                GameplaySoundEffects.PlayLevelSuccess();
                 feedbackMessages.Show("A matching pair Moving to the next stage");
                 pairingEffects.PlayMatch(held[0], held[1], items[index].pair);
                 // This choice is local to the level and never changes the ending.
                 StartCoroutine(ContinueToNextLevel());
             }
             else RejectPair();
+        }
+        private void PutDownItems()
+        {
+            int looseItem = draggingItem;
+            EndGesture();
+            if (looseItem >= 0) ItemContactFeedback.PlayDrop(items[looseItem].root);
+            for (int hand = 0; hand < held.Length; hand++)
+            {
+                int index = held[hand]; if (index < 0) continue;
+                items[index].root.SetParent(looseItemsRoot, true); held[hand] = -1;
+                ItemContactFeedback.PlayDrop(items[index].root);
+                interactionAssist?.SuppressPickup(items[index].collider, leftPalm, rightPalm);
+                for (int j = 0; j < itemRenderers[index].Length; j++) itemRenderers[index][j].sortingOrder = itemOrders[index][j];
+                interactionAssist?.MarkActivity();
+            }
+            firstHand = -1;
+        }
+        public bool CanOfferHints => !IsComplete && !resolving;
+        public void CollectHintTargets(List<Transform> targets)
+        {
+            for (int i = 0; i < items.Length; i++)
+                if (held[0] != i && held[1] != i && items[i].isMainItem == (firstHand < 0)) targets.Add(items[i].root);
         }
         private void RejectPair()
         {
@@ -162,6 +201,7 @@ namespace PinkDream
             rejection.AppendCallback(() =>
             {
                 items[a].root.SetParent(looseItemsRoot, true); items[b].root.SetParent(looseItemsRoot, true);
+                ItemContactFeedback.PlayDrop(items[a].root, false); ItemContactFeedback.PlayDrop(items[b].root, false);
                 held[0] = held[1] = -1; firstHand = -1;
             });
             rejection.Append(items[a].root.DOMove(targets[0], mismatchDropSeconds).SetEase(Ease.InQuad));

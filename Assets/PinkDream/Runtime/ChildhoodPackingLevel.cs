@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace PinkDream
 {
-    public sealed class ChildhoodPackingLevel : MonoBehaviour
+    public sealed class ChildhoodPackingLevel : MonoBehaviour, IInteractionHintSource
     {
         public enum ItemKind { Paintbrush, DrawingBook, Football, Umbrella, Toy, GameConsole, WaterCup, Storybook }
         public enum PocketKind { Side, Back, Main }
@@ -63,11 +63,22 @@ namespace PinkDream
         private Quaternion[] visualRotations;
         private Tween[] settling;
         private Sequence resolution;
+        private Renderer[][] itemRenderers;
+        private int[][] itemOrders;
         public bool IsComplete { get; private set; }
+
+        [SerializeField] private PlayerInteractionAssist interactionAssist;
 
         private void Awake()
         {
             girl.ReadMouseInput = false;
+            itemRenderers = new Renderer[items.Length][]; itemOrders = new int[items.Length][];
+            for (int i = 0; i < items.Length; i++)
+            {
+                itemRenderers[i] = items[i].root.GetComponentsInChildren<Renderer>(true);
+                itemOrders[i] = new int[itemRenderers[i].Length];
+                for (int j = 0; j < itemRenderers[i].Length; j++) itemOrders[i][j] = itemRenderers[i][j].sortingOrder;
+            }
             palms[0] = leftHandAnchor.parent.GetComponent<CircleCollider2D>();
             palms[1] = rightHandAnchor.parent.GetComponent<CircleCollider2D>();
             packed = new bool[items.Length]; occupants = new int[slots.Length];
@@ -85,7 +96,9 @@ namespace PinkDream
             Vector2 screen = Input.mousePosition;
             if (!Application.isFocused || !interactionCamera.pixelRect.Contains(screen)) { EndGesture(false); return; }
             Vector2 pointer = girl.ScreenToWorld(screen);
+            if (Input.GetMouseButtonDown(1)) { PutDownItems(); return; }
             if (Input.GetMouseButtonDown(0)) BeginGesture(pointer);
+            interactionAssist?.ObserveGesture(dragging || draggingZip || scheduleCard.IsDragging);
             if (Input.GetMouseButton(0) || Input.GetMouseButtonUp(0)) MoveGesture(pointer);
             if (!Input.GetMouseButton(0)) EndGesture(Input.GetMouseButtonUp(0));
         }
@@ -126,6 +139,7 @@ namespace PinkDream
                 for (int i = 0; i < items.Length; i++)
                 {
                     if (packed[i] || heldItems[0] == i || heldItems[1] == i) continue;
+                    if (interactionAssist != null && !interactionAssist.CanPickup(items[i].collider)) continue;
                     ColliderDistance2D contact = palms[hand].Distance(items[i].collider);
                     if (!contact.isValid || contact.distance > 0) continue;
                     heldItems[hand] = i; items[i].root.SetParent(hand == 0 ? leftHandAnchor : rightHandAnchor, true);
@@ -156,6 +170,34 @@ namespace PinkDream
                 StoreItem(index, hand, slot);
             }
         }
+        private void PutDownItems()
+        {
+            bool putDownLens = scheduleCard.IsDragging;
+            EndGesture(false);
+            if (putDownLens) ItemContactFeedback.PlayDrop(scheduleCard.Magnifier);
+            for (int hand = 0; hand < heldItems.Length; hand++)
+            {
+                int index = heldItems[hand]; if (index < 0) continue;
+                items[index].root.SetParent(looseItemsRoot, true); heldItems[hand] = -1;
+                ItemContactFeedback.PlayDrop(items[index].root);
+                interactionAssist?.SuppressPickup(items[index].collider, palms);
+                for (int j = 0; j < itemRenderers[index].Length; j++) itemRenderers[index][j].sortingOrder = itemOrders[index][j];
+                interactionAssist?.MarkActivity();
+            }
+        }
+        public bool CanOfferHints => !IsComplete && !resolving;
+        public void CollectHintTargets(List<Transform> targets)
+        {
+            if (!scheduleCard.Revealed) { targets.Add(scheduleCard.Magnifier); targets.Add(scheduleCard.CardTarget); return; }
+            bool full = true; foreach (int item in occupants) if (item < 0) full = false;
+            if (full) { targets.Add(zipperHandle); return; }
+            if (heldItems[0] >= 0 || heldItems[1] >= 0)
+            {
+                for (int s = 0; s < slots.Length; s++) if (occupants[s] < 0) targets.Add(slots[s].zone.transform);
+                return;
+            }
+            for (int i = 0; i < items.Length; i++) if (!packed[i] && items[i].collider.enabled) targets.Add(items[i].root);
+        }
         private void StoreItem(int index, int hand, int slot)
         {
             PackingItem item = items[index]; heldItems[hand] = -1; occupants[slot] = index; packed[index] = true;
@@ -180,7 +222,8 @@ namespace PinkDream
             for (int s = 0; s < slots.Length; s++) if (occupants[s] >= 0 && items[occupants[s]].kind != Needed(slots[s].kind)) wrong.Add(s);
             if (wrong.Count > 0) { RejectItems(wrong); return; }
             foreach (int item in occupants) if (item < 0) { ReturnZipper("Fill all three places before closing the bag"); return; }
-            IsComplete = true; openBag.SetActive(false); closedBag.SetActive(true);
+            IsComplete = true; GameplaySoundEffects.PlayLevelSuccess();
+            openBag.SetActive(false); closedBag.SetActive(true);
             foreach (int index in occupants) items[index].root.gameObject.SetActive(false);
             feedbackMessages.Show("Ready for tomorrow   Moving to the next stage");
             completionGlow?.Play();
@@ -195,7 +238,8 @@ namespace PinkDream
         }
         private void RejectItems(List<int> wrongSlots)
         {
-            resolving = true; feedbackMessages.Show("The wrong items came out   Keep the correct ones and try again");
+            resolving = true;
+            feedbackMessages.Show("The wrong items came out   Keep the correct ones and try again");
             resolution = DOTween.Sequence().SetUpdate(true).SetLink(gameObject, LinkBehaviour.KillOnDisable);
             resolution.Join(zipperHandle.DOMove(zipperStart.position, 0.2f).SetEase(Ease.OutQuad));
             var rejected = new List<int>();
@@ -207,6 +251,7 @@ namespace PinkDream
                 item.root.SetParent(looseItemsRoot, true); item.root.rotation = Quaternion.identity;
                 item.visual.localPosition = visualPositions[index]; item.visual.localRotation = visualRotations[index]; item.visual.localScale = visualScales[index];
                 item.root.position += center - item.visual.position; SetItemOrder(item, 210);
+                ItemContactFeedback.PlayDrop(item.root, false);
                 Vector3 landing = packedItemsRoot.position + new Vector3(-1.85f + n * 1.2f, -2.65f, 0);
                 landing.z = item.root.position.z;
                 resolution.Join(item.root.DOJump(landing, 0.6f, 1, 0.5f).SetEase(Ease.OutQuad));
