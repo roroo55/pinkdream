@@ -49,6 +49,9 @@ namespace PinkDream
         [SerializeField] private float completionHoldSeconds = 2f;
         [SerializeField] private string nextScene = "Level04_AdolescencePiercing";
 
+        [SerializeField] private SceneTextGroup feedbackMessages;
+        [SerializeField] private SceneTextGroup progressMessages;
+
         private readonly int[] heldItems = { -1, -1 };
         private readonly CircleCollider2D[] palms = new CircleCollider2D[2];
         private int[] occupants;
@@ -102,7 +105,7 @@ namespace PinkDream
             if (scheduleCard.IsDragging)
             {
                 bool wasRevealed = scheduleCard.Revealed; scheduleCard.MoveDrag(pointer);
-                if (!wasRevealed && scheduleCard.Revealed) feedbackText.text = "Follow the three icons and choose the right pockets";
+                if (!wasRevealed && scheduleCard.Revealed) feedbackMessages.Show("Follow the three icons and choose the right pockets");
                 return;
             }
             if (draggingZip)
@@ -127,7 +130,7 @@ namespace PinkDream
                     if (!contact.isValid || contact.distance > 0) continue;
                     heldItems[hand] = i; items[i].root.SetParent(hand == 0 ? leftHandAnchor : rightHandAnchor, true);
                     ItemContactFeedback.Play(items[i].root); SetItemOrder(items[i], 300);
-                    feedbackText.text = "Picked up " + items[i].itemName + "   Place it in a pocket and release";
+                    feedbackMessages.Show("pickup_" + i);
                     break;
                 }
             }
@@ -141,7 +144,7 @@ namespace PinkDream
             {
                 int index = heldItems[hand]; if (index < 0) continue;
                 bool full = true; foreach (int stored in occupants) if (stored < 0) full = false;
-                if (full) { feedbackText.text = "The bag is full   Close the zipper to check"; break; }
+                if (full) { feedbackMessages.Show("The bag is full   Close the zipper to check"); break; }
                 int slot = -1;
                 for (int s = 0; s < slots.Length; s++)
                 {
@@ -149,7 +152,7 @@ namespace PinkDream
                     if (slots[s].zone.OverlapPoint(palms[hand].transform.TransformPoint(palms[hand].offset)) && contact.isValid && contact.distance <= 0) { slot = s; break; }
                 }
                 if (slot < 0) continue;
-                if (occupants[slot] >= 0) { feedbackText.text = "That place is full   Try another pocket"; continue; }
+                if (occupants[slot] >= 0) { feedbackMessages.Show("That place is full   Try another pocket"); continue; }
                 StoreItem(index, hand, slot);
             }
         }
@@ -168,7 +171,7 @@ namespace PinkDream
             var settle = DOTween.Sequence().SetUpdate(true).SetLink(item.root.gameObject, LinkBehaviour.KillOnDisable);
             settle.Join(item.visual.DOMove(slots[slot].displayAnchor.position, 0.18f).SetEase(Ease.OutQuad));
             settle.Join(item.visual.DOScale(new Vector3(scale, scale, 1), 0.18f).SetEase(Ease.OutQuad)); settling[index] = settle;
-            feedbackText.text = "Packed   Fill three places then close the zipper"; UpdateProgress();
+            feedbackMessages.Show("Packed   Fill three places then close the zipper"); UpdateProgress();
         }
         private void CheckBag()
         {
@@ -179,20 +182,20 @@ namespace PinkDream
             foreach (int item in occupants) if (item < 0) { ReturnZipper("Fill all three places before closing the bag"); return; }
             IsComplete = true; openBag.SetActive(false); closedBag.SetActive(true);
             foreach (int index in occupants) items[index].root.gameObject.SetActive(false);
-            feedbackText.text = "Ready for tomorrow   Moving to the next stage";
+            feedbackMessages.Show("Ready for tomorrow   Moving to the next stage");
             completionGlow?.Play();
             StartCoroutine(ContinueToNextLevel());
         }
         private void ReturnZipper(string message)
         {
-            feedbackText.text = message; resolving = true;
+            feedbackMessages.Show(message); resolving = true;
             resolution = DOTween.Sequence().SetUpdate(true).SetLink(gameObject, LinkBehaviour.KillOnDisable);
             resolution.Append(zipperHandle.DOMove(zipperStart.position, 0.2f).SetEase(Ease.OutQuad));
             resolution.OnComplete(() => { zipProgress = 0; resolving = false; }); resolution.OnKill(() => resolution = null);
         }
         private void RejectItems(List<int> wrongSlots)
         {
-            resolving = true; feedbackText.text = "The wrong items came out   Keep the correct ones and try again";
+            resolving = true; feedbackMessages.Show("The wrong items came out   Keep the correct ones and try again");
             resolution = DOTween.Sequence().SetUpdate(true).SetLink(gameObject, LinkBehaviour.KillOnDisable);
             resolution.Join(zipperHandle.DOMove(zipperStart.position, 0.2f).SetEase(Ease.OutQuad));
             var rejected = new List<int>();
@@ -224,7 +227,7 @@ namespace PinkDream
                 bool full = occupants[s] >= 0; if (full) count++;
                 slots[s].capacityDot.color = full ? new Color32(184, 95, 137, 255) : new Color32(255, 238, 245, 255);
             }
-            progressText.text = "Packed " + EnglishText.Number(count) + " of three";
+            progressMessages.Show("count_" + count);
         }
         private static void SetItemOrder(PackingItem item, int order)
         {

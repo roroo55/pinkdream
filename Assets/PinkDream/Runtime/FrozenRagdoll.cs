@@ -15,6 +15,7 @@ namespace PinkDream
         [SerializeField] private List<SpriteRenderer> bodyColors = new List<SpriteRenderer>();
         [SerializeField] private Transform visualRoot;
         [SerializeField] private bool showPrototypeOverlay = true;
+        [SerializeField] private SceneTextGroup prototypeState;
         [Header("人物体型（成人保持默认值）")]
         [SerializeField, Min(0.1f)] private float bodyScale = 1;
         [SerializeField, Min(0.5f)] private float headScale = 1;
@@ -98,6 +99,7 @@ namespace PinkDream
             if (!inside || !Application.isFocused)
             {
                 Model.EndDrag();
+                if (showPrototypeOverlay && prototypeState != null) prototypeState.Show("FROZEN");
                 SetHighlight(-1);
                 return;
             }
@@ -118,6 +120,7 @@ namespace PinkDream
                     Model.EndDrag();
             }
             SetHighlight(Model.IsDragging ? Model.GrabbedPart : -1);
+            if (showPrototypeOverlay && prototypeState != null) prototypeState.Show(Model.IsDragging ? "DRAGGING" : "FROZEN");
         }
 
         public Vector2 ScreenToWorld(Vector2 screen)
@@ -399,27 +402,6 @@ namespace PinkDream
             return sprite;
         }
 #endif
-
-        private void OnGUI()
-        {
-            if (!showPrototypeOverlay || Model == null || uiFont == null)
-                return;
-            float scale = Mathf.Clamp(Mathf.Min(Screen.width / 1100f, Screen.height / 740f), 0.55f, 1.8f);
-            Matrix4x4 previous = GUI.matrix;
-            GUI.matrix = Matrix4x4.Scale(Vector3.one * scale);
-            float w = Screen.width / scale, h = Screen.height / scale;
-            var small = new GUIStyle(GUI.skin.label) { font = uiFont, fontSize = 14, normal = { textColor = Ink } };
-            var title = new GUIStyle(small) { fontSize = 30, fontStyle = FontStyle.Bold };
-            var hint = new GUIStyle(small) { fontSize = 17, alignment = TextAnchor.MiddleCenter };
-            GUI.Label(new Rect(36, 25, w - 72, 28), "RAGDOLL PROTOTYPE", small);
-            GUI.Label(new Rect(34, 55, w - 68, 50), "Pink Dream", title);
-            small.alignment = TextAnchor.UpperRight;
-            GUI.Label(new Rect(w - 290, 32, 250, 30), Model.IsDragging ? "DRAGGING" : "FROZEN", small);
-            GUI.Label(new Rect(24, h - 83, w - 48, 32), "Drag the head body or limbs to strike a pose", hint);
-            hint.fontSize = 14;
-            GUI.Label(new Rect(24, h - 53, w - 48, 30), "Move the mouse to pose Release to hold", hint);
-            GUI.matrix = previous;
-        }
 
         private void OnDestroy()
         {

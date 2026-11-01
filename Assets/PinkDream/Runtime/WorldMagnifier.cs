@@ -4,6 +4,7 @@ using UnityEngine;
 namespace PinkDream
 {
     // Optical view only. No character poses, colliders or item transforms are changed.
+    [ExecuteAlways]
     public sealed class WorldMagnifier : MonoBehaviour
     {
         [SerializeField] private Camera worldCamera, captureCamera;
@@ -17,7 +18,8 @@ namespace PinkDream
         private bool[] rendererStates, canvasStates;
         private bool rendering;
 
-        private void Awake() { Initialize(); captureCamera.enabled = false; }
+        private void Awake() { if (captureCamera != null) captureCamera.enabled = false; }
+        private void OnValidate() { excludedRenderers = null; excludedCanvases = null; }
         // Refresh the image when an object moves beneath a stationary lens too.
         // This updates only the offscreen camera, never an animation bone.
         private void LateUpdate() { CaptureView(); }
@@ -25,7 +27,7 @@ namespace PinkDream
         {
             if (excludedRenderers != null) return;
             var renderers = new HashSet<Renderer>(); var canvases = new HashSet<Canvas>();
-            foreach (GameObject visual in excludedVisuals)
+            foreach (GameObject visual in excludedVisuals ?? System.Array.Empty<GameObject>())
             {
                 if (visual == null) continue;
                 foreach (Renderer renderer in visual.GetComponentsInChildren<Renderer>(true)) renderers.Add(renderer);

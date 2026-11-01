@@ -51,6 +51,9 @@ namespace PinkDream
 
         // Center is zero. The four corners follow clockwise from upper left.
         private static readonly int[,] Neighbors = { {0,1},{0,2},{0,3},{0,4},{1,2},{2,3},{3,4},{4,1} };
+        [SerializeField] private SceneTextGroup feedbackMessages;
+        [SerializeField] private SceneTextGroup combinationMessages;
+
         private readonly int[] held = { -1, -1 };
         private readonly CircleCollider2D[] palms = new CircleCollider2D[2];
         private int[] occupants, slotOf;
@@ -76,7 +79,7 @@ namespace PinkDream
                 for (int r = 0; r < orders[i].Length; r++) orders[i][r] = renderers[i][r].sortingOrder;
             }
             handleRest = pullHandle.position; ClearIndicators(); UpdateCombination();
-            feedbackText.text = "Use the magnifier to read the birthday card";
+            feedbackMessages.Show("Use the magnifier to read the birthday card");
         }
         private static bool Touches(Collider2D a, Collider2D b)
         {
@@ -107,7 +110,7 @@ namespace PinkDream
                     if (!Eligible(i) || !choices[i].collider.OverlapPoint(pointer)) continue;
                     for (int hand = 0; hand < 2; hand++) if (held[hand] < 0 && Touches(palms[hand], choices[i].collider)) { Take(i, hand); part = hand == 0 ? 3 : 5; break; }
                     if (part >= 0) break;
-                    feedbackText.text = "Use her hand to take or move a decoration";
+                    feedbackMessages.Show("Use her hand to take or move a decoration");
                 }
             if (part < 0) part = girl.Pick(pointer);
             if (part >= 0) { draggingGirl = true; girl.BeginControlledDrag(part, pointer); }
@@ -118,7 +121,7 @@ namespace PinkDream
             if (birthdayCard.IsDragging)
             {
                 bool known = birthdayCard.Revealed; birthdayCard.MoveDrag(pointer);
-                if (!known && birthdayCard.Revealed) feedbackText.text = "Use her hands to fill five places   Pull the cord to check";
+                if (!known && birthdayCard.Revealed) feedbackMessages.Show("Use her hands to fill five places   Pull the cord to check");
                 return;
             }
             if (draggingCord)
@@ -151,7 +154,7 @@ namespace PinkDream
             int min = int.MaxValue; foreach (int order in orders[index]) min = Mathf.Min(min, order);
             for (int r = 0; r < orders[index].Length; r++) renderers[index][r].sortingOrder = 400 + orders[index][r] - min;
             ItemContactFeedback.Play(choices[index].item);
-            feedbackText.text = "Touch an empty cake place with the decoration then release";
+            feedbackMessages.Show("Touch an empty cake place with the decoration then release");
         }
         private void Release(int index)
         {
@@ -168,7 +171,7 @@ namespace PinkDream
             sequence.Append(choice.item.DOMove(slots[slot].anchor.position, decorationRevealSeconds).SetEase(Ease.OutQuad));
             sequence.Join(choice.item.DORotateQuaternion(Quaternion.identity, decorationRevealSeconds).SetEase(Ease.OutQuad));
             sequence.OnComplete(() => { settling[index] = false; choice.collider.enabled = true; if (feedback != null) feedback.enabled = true; Physics2D.SyncTransforms(); });
-            ClearIndicators(); UpdateCombination(); feedbackText.text = "Pull the cord to check   Use her hands to adjust decorations";
+            ClearIndicators(); UpdateCombination(); feedbackMessages.Show("Pull the cord to check   Use her hands to adjust decorations");
         }
         private void EndGesture(bool confirm)
         {
@@ -186,7 +189,7 @@ namespace PinkDream
                 if (touched >= 0)
                 {
                     if (occupants[touched] < 0) Place(index, touched);
-                    else feedbackText.text = "That place is full   Take its decoration out first";
+                    else feedbackMessages.Show("That place is full   Take its decoration out first");
                 }
                 else Release(index);
             }
@@ -214,7 +217,7 @@ namespace PinkDream
         private void UpdateCombination()
         {
             int count = 0; foreach (int index in occupants) if (index >= 0) count++;
-            combinationText.text = "Placed " + EnglishText.Number(count) + " of five";
+            combinationMessages.Show("count_" + count);
         }
         private void FinishDecorating()
         {
@@ -223,13 +226,13 @@ namespace PinkDream
             { ruleIndicators[i].neutral.SetActive(false); ruleIndicators[i].passed.SetActive(result[i]); ruleIndicators[i].failed.SetActive(!result[i]); valid &= result[i]; }
             if (!valid)
             {
-                feedbackText.text = "Check the red rule icons   Keep your cake and try again"; ReturnCord(); return;
+                feedbackMessages.Show("Check the red rule icons   Keep your cake and try again"); ReturnCord(); return;
             }
             HasFinished = true; EndGesture(false);
             for (int hand = 0; hand < 2; hand++) if (held[hand] >= 0) Release(held[hand]);
             finishControl.SetActive(false); birthdayCard.HideForCelebration();
             foreach (var hint in preparationHints) hint.SetActive(false);
-            feedbackText.text = string.Empty; celebration.Begin();
+            feedbackMessages.Hide(); celebration.Begin();
         }
         private void UpdateRope() => pullRope.SetPosition(1, pullRope.transform.InverseTransformPoint(pullHandle.position));
         private void ReturnCord()

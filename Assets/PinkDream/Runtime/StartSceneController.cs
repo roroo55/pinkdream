@@ -169,7 +169,6 @@ namespace PinkDream
                 return;
             }
             discoveredStart.alpha = 1;
-            instructionText.text = "START found Hold the magnifier still for one second";
             if (!alignedLastFrame || Vector2.Distance(center, dwellAnchor) > stillnessTolerance)
             {
                 dwellAnchor = center;
@@ -189,7 +188,6 @@ namespace PinkDream
             dwellTime = 0;
             alignedLastFrame = false;
             discoveredStart.alpha = 0;
-            instructionText.text = "Move the magnifier over the ultrasound You can drag the parents too";
         }
 
         private void EndGesture()

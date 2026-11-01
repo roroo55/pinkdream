@@ -44,6 +44,8 @@ namespace PinkDream
         [SerializeField] private Transform completionEffects;
         [SerializeField] private LevelCompletionGlow completionGlow;
 
+        [SerializeField] private SceneTextGroup feedbackMessages;
+
         private readonly CircleCollider2D[] palms = new CircleCollider2D[2];
         private readonly int[] held = { -1, -1 };
         private readonly bool[] revealed = new bool[2], cleaned = new bool[2], marked = new bool[2], pierced = new bool[2];
@@ -100,8 +102,7 @@ namespace PinkDream
             if (inspectionLens.BeginDrag(pointer)) return;
             if (mirrorCollider.OverlapPoint(pointer))
             {
-                ShowNextStep();
-                if (held[0] >= 0 && held[1] >= 0 && !Both(marked)) feedbackText.text += "\nSet tools down away from the ears";
+                ShowNextStep(held[0] >= 0 && held[1] >= 0 && !Both(marked));
                 mirrorTween?.Kill(); mirrorAccent.color = Cyan;
                 mirrorTween = DOTween.To(() => mirrorAccent.color, c => mirrorAccent.color = c, Neutral, .65f).SetUpdate(true).SetLink(gameObject);
                 return;
@@ -225,18 +226,18 @@ namespace PinkDream
             switch (objects[item].kind)
             {
                 case PropKind.Cotton:
-                    if (!Both(revealed)) { feedbackText.text = "Use the magnifier to discover both ear spots first"; return; }
+                    if (!Both(revealed)) { feedbackMessages.Show("Use the magnifier to discover both ear spots first"); return; }
                     if (cleaned[ear]) return;
                     cleaned[ear] = true; Flash(ears[ear].cleanFlash, Green, .6f);
                     if (Both(cleaned)) ReturnToTray(item);
                     RefreshProgress(); ShowNextStep(); break;
                 case PropKind.Marker:
-                    if (!Both(cleaned)) { feedbackText.text = "Clean both ears before making any marks"; return; }
+                    if (!Both(cleaned)) { feedbackMessages.Show("Clean both ears before making any marks"); return; }
                     if (marked[ear]) return;
                     marked[ear] = true; if (Both(marked)) ReturnToTray(item);
                     RefreshProgress(); ShowNextStep(); break;
                 case PropKind.Machine: OperateMachine(ear); break;
-                case PropKind.Stud: feedbackText.text = "Load the stud into the machine first"; break;
+                case PropKind.Stud: feedbackMessages.Show("Load the stud into the machine first"); break;
             }
         }
         private void OperateMachine(int ear)
@@ -249,12 +250,12 @@ namespace PinkDream
             RefreshProgress(); FlashLight(Green);
             if (Both(pierced) && earStyles[0] == earStyles[1])
             {
-                IsComplete = true; feedbackText.text = "Both ears match   Moving to the next stage";
+                IsComplete = true; feedbackMessages.Show("Both ears match   Moving to the next stage");
                 Celebrate(); if (Application.isPlaying) StartCoroutine(ContinueToNextLevel());
             }
             else ShowNextStep();
         }
-        private void Refuse(string message) { feedbackText.text = message; FlashLight(new Color32(240,85,98,255)); }
+        private void Refuse(string message) { feedbackMessages.Show(message); FlashLight(new Color32(240,85,98,255)); }
         private Color BaseLight => IsComplete ? Green : loaded >= 0 ? Gold : Neutral;
         private void FlashLight(Color color)
         {
@@ -279,9 +280,9 @@ namespace PinkDream
             for (int i = 0; i < loadedIcons.Length; i++) loadedIcons[i].SetActive(loaded >= 0 && chosenStyle == i);
             lightTween?.Kill(); machineLight.color = BaseLight; inspectionLens.RefreshView();
         }
-        private void ShowNextStep()
+        private void ShowNextStep(bool handsHint = false)
         {
-            feedbackText.text = !Both(revealed) ? "Use the magnifier to find both suggested ear spots" :
+            string state = !Both(revealed) ? "Use the magnifier to find both suggested ear spots" :
                 !Both(cleaned) ? "Touch both ears with the cleaning pad and release" :
                 !Both(marked) ? "Touch each suggested spot with the marker and release" :
                 chosenStyle < 0 ? "Choose a stud and load it into the machine" :
@@ -289,6 +290,7 @@ namespace PinkDream
                 !pierced[0] && !pierced[1] ? "Align the machine with either ear mark and release" :
                 !pierced[0] ? "Align the machine with the left mark and release" :
                 !pierced[1] ? "Align the machine with the right mark and release" : "Both ears match";
+            feedbackMessages.Show(state + (handsHint ? "\nSet tools down away from the ears" : string.Empty));
         }
         private void Celebrate()
         {

@@ -40,6 +40,8 @@ namespace PinkDream
         private bool draggingBaby, resolving;
         private Vector2 itemGrabOffset;
         private CircleCollider2D leftPalm, rightPalm;
+        [SerializeField] private SceneTextGroup feedbackMessages;
+
         private readonly int[] held = { -1, -1 };
         private Sequence rejection;
         public bool IsComplete { get; private set; }
@@ -128,7 +130,7 @@ namespace PinkDream
             if (firstHand < 0)
             {
                 firstHand = hand;
-                feedbackText.text = "Use the other hand to find a matching partner";
+                feedbackMessages.Show("Use the other hand to find a matching partner");
                 if (wasDraggingItem)
                 {
                     draggingItem = -1; draggingBaby = true;
@@ -141,7 +143,7 @@ namespace PinkDream
             if (items[held[0]].pair == items[held[1]].pair)
             {
                 IsComplete = true;
-                feedbackText.text = "A matching pair Moving to the next stage";
+                feedbackMessages.Show("A matching pair Moving to the next stage");
                 pairingEffects.PlayMatch(held[0], held[1], items[index].pair);
                 // This choice is local to the level and never changes the ending.
                 StartCoroutine(ContinueToNextLevel());
@@ -151,7 +153,7 @@ namespace PinkDream
         private void RejectPair()
         {
             resolving = true;
-            feedbackText.text = "Not a match Try another pair";
+            feedbackMessages.Show("Not a match Try another pair");
             int a = held[0], b = held[1];
             Vector3[] targets = DropTargets(a, b);
             items[a].collider.enabled = false; items[b].collider.enabled = false;

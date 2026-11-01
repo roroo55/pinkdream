@@ -12,6 +12,7 @@ namespace PinkDream
         [SerializeField] private GameObject[] neutralFace;
         [SerializeField] private GameObject happyFace;
         [SerializeField] private Text restartHint;
+        [SerializeField] private SceneTextGroup restartMessages;
         [SerializeField] private GameObject cakeGlow;
         [SerializeField] private GameObject[] flames;
         [SerializeField] private ParticleSystem[] confetti;
@@ -174,8 +175,8 @@ namespace PinkDream
             if (!returnPromptShown)
             {
                 returnPromptShown = true;
-                if (restartHint != null)
-                    restartHint.text = "Click an empty area to return to START";
+                if (restartMessages != null)
+                    restartMessages.Show("Click an empty area to return to START");
             }
             // Releasing the finish cord is never treated as the restart click.
             if (!Input.GetMouseButton(0))
