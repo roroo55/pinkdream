@@ -33,9 +33,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _ApertureAngle: -36.66564
+    - _ApertureAngle: -36.66565
     m_Colors:
-    - _ApertureRadii: {r: 0.39425513, g: 0.36078063, b: 0, a: 0}
+    - _ApertureRadii: {r: 0.37045115, g: 0.3457544, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

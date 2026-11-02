@@ -8,7 +8,7 @@ namespace PinkDream
 {
     public sealed class AdolescencePiercingLevel : MonoBehaviour, IInteractionHintSource
     {
-        public enum PropKind { Cotton, Marker, Machine, Stud }
+        public enum PropKind { Cotton, Marker, Machine, Stud, Keepsake }
         public enum StudStyle { Star, Ring, Spike }
         [System.Serializable] public sealed class EarTarget
         {
@@ -220,13 +220,13 @@ namespace PinkDream
                 if (!loadingAttempt)
                     for (int hand = 0; hand < 2; hand++)
                     {
-                        int item = held[hand]; if (item < 0 || activeProp >= 0 && item != activeProp) continue;
+                        int item = held[hand]; if (item < 0 || objects[item].kind == PropKind.Keepsake || activeProp >= 0 && item != activeProp) continue;
                         for (int ear = 0; ear < 2; ear++) if (Touches(objects[item].tip, ears[ear].lobe)) { UseAtEar(item, ear); break; }
                     }
                 // Set down away from the ears. A second click can regrasp at contact.
                 for (int hand = 0; hand < 2; hand++)
                 {
-                    int item = held[hand]; if (item < 0 || activeProp >= 0 && item != activeProp) continue;
+                    int item = held[hand]; if (item < 0 || objects[item].kind == PropKind.Keepsake || activeProp >= 0 && item != activeProp) continue;
                     bool atEar = Touches(objects[item].tip ?? objects[item].collider, ears[0].lobe) || Touches(objects[item].tip ?? objects[item].collider, ears[1].lobe);
                     if (!atEar && (objects[item].kind != PropKind.Stud || !Touches(objects[item].collider, loadingZone))) Release(item, true);
                 }
