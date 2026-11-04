@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: d44fbdfae28a6024b89af24ab6b474fb
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 300643
+  packageName: VolFx - VFX Toolkit (Post Processing, Shaders, Timeline Tools)
+  packageVersion: 2.11.6
+  assetPath: Packages/www.nulltale.volfx/Samples/VolFx/Sprites/AnOldFriend/License.txt
+  uploadId: 910756

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 554804cf8c6bf9544a3f8ff20f3bcbac
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 300643
+  packageName: VolFx - VFX Toolkit (Post Processing, Shaders, Timeline Tools)
+  packageVersion: 2.11.6
+  assetPath: Packages/www.nulltale.volfx/Samples/VolFx/VolFx.Samples.asmdef
+  uploadId: 910756
