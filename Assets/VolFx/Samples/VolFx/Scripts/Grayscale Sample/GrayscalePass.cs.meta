@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: ff530a28ee2942c429ac8879889d8215
+timeCreated: 1693927804
+AssetOrigin:
+  serializedVersion: 1
+  productId: 300643
+  packageName: VolFx - VFX Toolkit (Post Processing, Shaders, Timeline Tools)
+  packageVersion: 2.11.6
+  assetPath: Packages/www.nulltale.volfx/Samples/VolFx/Scripts/Grayscale Sample/GrayscalePass.cs
+  uploadId: 910756

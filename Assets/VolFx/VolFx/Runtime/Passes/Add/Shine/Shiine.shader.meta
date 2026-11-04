@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: afbeb080aee6e15489649a0b435c6ee1
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 300643
+  packageName: VolFx - VFX Toolkit (Post Processing, Shaders, Timeline Tools)
+  packageVersion: 2.11.6
+  assetPath: Packages/www.nulltale.volfx/VolFx/Runtime/Passes/Add/Chromatic/Chromatic.shader
+  uploadId: 910756

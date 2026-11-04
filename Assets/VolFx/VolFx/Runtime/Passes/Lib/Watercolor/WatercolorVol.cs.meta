@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: b0faa963e8883e145805da46bed83f45
+timeCreated: 1696967500
+AssetOrigin:
+  serializedVersion: 1
+  productId: 300643
+  packageName: VolFx - VFX Toolkit (Post Processing, Shaders, Timeline Tools)
+  packageVersion: 2.11.6
+  assetPath: Packages/www.nulltale.volfx/VolFx/Runtime/Passes/Lib/Watercolor/WatercolorVol.cs
+  uploadId: 910756

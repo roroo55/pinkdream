@@ -1,0 +1,10 @@
+fileFormatVersion: 2
+guid: 0362702657b851e4c8bb6c4df77a5709
+timeCreated: 1676459180
+AssetOrigin:
+  serializedVersion: 1
+  productId: 300643
+  packageName: VolFx - VFX Toolkit (Post Processing, Shaders, Timeline Tools)
+  packageVersion: 2.11.6
+  assetPath: Packages/www.nulltale.volfx/VolFx/Runtime/Passes/Add/Chromatic/ChromaticVol.cs
+  uploadId: 910756
